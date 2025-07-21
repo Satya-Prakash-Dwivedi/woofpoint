@@ -1,0 +1,69 @@
+# General OS X
+.DS_Store
+
+# Node.js dependencies and logs (ignore in all folders)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output folders for both Android and iOS (in any location under the repo except where specifically allowed)
+**/build/
+
+# Xcode and iOS
+ios/DerivedData/
+ios/build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.xcuserstate
+**/.xcode.env.local
+
+# Android/IntelliJ
+android/.gradle/
+android/build/
+android/.idea/
+android/.cxx/
+android/local.properties
+android/*.iml
+*.iml
+*.hprof
+*.keystore
+!debug.keystore
+.kotlin/
+
+# Yarn v2+
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Fastlane files (in any subfolder)
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/screenshots/
+**/fastlane/test_output
+
+# Metro health check
+.metro-health-check*
+
+# CocoaPods (Pods in any folder)
+**/Pods/
+vendor/bundle/
+
+# Bundled JS artifacts
+*.jsbundle
+
+# Test coverage output
+coverage/
