@@ -1,8 +1,13 @@
-import { Image, StyleSheet, Text, View, SafeAreaView, ScrollView } from 'react-native'
+import { Image, StyleSheet, Text, View, SafeAreaView, ScrollView, Button, TouchableOpacity } from 'react-native'
 import React from 'react'
 
+// Navigation
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { RootStackParamList } from '../../App'
 
-const Landing = () => {
+type LandingProps = NativeStackScreenProps<RootStackParamList, 'Landing'>
+
+const Landing = ({ navigation }: LandingProps) => {
     return (
         <SafeAreaView style={{ backgroundColor: '#fff2e6' }}>
             <ScrollView>
@@ -64,12 +69,24 @@ const Landing = () => {
                             <Text style={styles.BottomText}>Explore Trainers</Text>
                         </View>
                         <View style={{ flex: 2, flexDirection: 'row', gap: 10 }}>
-                            <View style={[styles.BottomAuth, styles.BottomButtonOverride]}>
-                                <Text style={[styles.BottomText, { color: 'orange' }]}>Log In</Text>
-                            </View>
-                            <View style={styles.BottomAuth}>
-                                <Text style={styles.BottomText}>Sign Up</Text>
-                            </View>
+                            <TouchableOpacity
+                                style={[styles.BottomAuth]}
+                            >
+                                <Button
+                                    color={'white'}
+                                    title='Log In'
+                                    onPress={() => navigation.navigate("Login")}
+                                />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.BottomAuth]}
+                            >
+                                <Button
+                                    color={'white'}
+                                    title='Sign Up'
+                                    onPress={() => navigation.navigate("Signup")}
+                                />
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
@@ -167,14 +184,8 @@ const styles = StyleSheet.create({
     BottomAuth: {
         backgroundColor: 'orange',
         width: 145,
-        padding: 10,
         marginTop: 10,
-        borderRadius: 10
+        borderRadius: 10,
+        color: 'white'
     },
-    BottomButtonOverride: {
-        backgroundColor: 'white',
-        borderWidth: 1,
-        borderColor: 'orange',
-
-    }
 })

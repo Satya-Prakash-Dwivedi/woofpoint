@@ -45,7 +45,7 @@ export default Login
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 50,
+        paddingTop: 50,
         backgroundColor: '#FEFBF6',
         height: 750
     },
