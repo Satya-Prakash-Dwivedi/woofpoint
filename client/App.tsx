@@ -25,7 +25,7 @@ function app() {
           name="Landing"
           component={Landing}
           options={{
-            title: "Landing Page"
+            title: ""
           }}
         />
 
@@ -33,7 +33,7 @@ function app() {
           name="Login"
           component={Login}
           options={{
-            title: "Login Page"
+            title: ""
           }}
         />
 
@@ -41,7 +41,7 @@ function app() {
           name="Signup"
           component={Signup}
           options={{
-            title: "Signup Page"
+            title: ""
           }}
         />
 
@@ -49,7 +49,7 @@ function app() {
           name="Role"
           component={Role}
           options={{
-            title: "Role Selection Page"
+            title: ""
           }}
         />
       </Stack.Navigator>
