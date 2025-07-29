@@ -212,12 +212,6 @@ const Signup: React.FC = () => {
         // navigation.navigate('Login'); // Uncomment when using navigation
     };
 
-    const handleBack = () => {
-        console.log('Back pressed');
-        // Navigate back to landing screen
-        // navigation.goBack(); // Uncomment when using navigation
-    };
-
     return (
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView
