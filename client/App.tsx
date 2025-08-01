@@ -3,6 +3,7 @@ import Landing from "./src/screens/Landing";
 import Role from "./src/screens/Role";
 import Login from "./src/screens/Login";
 import Signup from "./src/screens/Signup";
+import HomeScreen from "./src/screens/HomeOwner";
 
 // Navigation
 import { NavigationContainer } from "@react-navigation/native"
@@ -13,6 +14,7 @@ export type RootStackParamList = {
   Login: undefined;
   Signup: undefined;
   Role: undefined;
+  HomeScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -46,8 +48,8 @@ function app() {
         />
 
         <Stack.Screen
-          name="Role"
-          component={Role}
+          name="HomeScreen"
+          component={HomeScreen}
           options={{
             title: ""
           }}

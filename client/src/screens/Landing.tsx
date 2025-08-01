@@ -65,9 +65,13 @@ const Landing = ({ navigation }: LandingProps) => {
                         </View>
                     </View>
                     <View style={styles.Bottom}>
-                        <View style={styles.BottomButton}>
-                            <Text style={styles.BottomText}>Explore Trainers</Text>
-                        </View>
+                        <TouchableOpacity style={styles.BottomButton}>
+                            <Button
+                                color={'white'}
+                                title='Explore Trainers'
+                                onPress={() => navigation.navigate("HomeScreen")}
+                            />
+                        </TouchableOpacity>
                         <View style={{ flex: 2, flexDirection: 'row', gap: 10 }}>
                             <TouchableOpacity
                                 style={[styles.BottomAuth]}
@@ -170,7 +174,7 @@ const styles = StyleSheet.create({
     },
     BottomButton: {
         backgroundColor: 'orange',
-        padding: 10,
+        paddingHorizontal: 10,
         width: 300,
         alignItems: 'center',
         borderRadius: 10

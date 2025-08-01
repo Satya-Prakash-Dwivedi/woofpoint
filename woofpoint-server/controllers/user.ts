@@ -4,7 +4,8 @@ import jwt from "jsonwebtoken"
 import User from "../models/user";
 
 export const signup = async (req: Request, res: Response) => {
-    const { email, firstName, lastName, password, role } = req.body;
+    const { email, firstName, lastName, password, role, phone, zipCode } = req.body;
+    const profilePhoto = (req.file as any)?.location;  // multer-s3 puts URL in location
 
     try {
         // First check if user already exists or not
@@ -16,13 +17,17 @@ export const signup = async (req: Request, res: Response) => {
         }
         // Hash the password
         const hashed = await bcrypt.hash(password, 10);
+
         // Create User with all the required fields
         const user = await User.create({
             email,
             password: hashed,
             firstName,
             lastName,
-            role: role || 'owner' // default role is owner
+            role: role || 'owner', // default role is owner
+            profilePhoto,
+            phone,
+            zipCode,
         });
 
         const token = jwt.sign(     // Payload will containe user id and role
@@ -36,6 +41,9 @@ export const signup = async (req: Request, res: Response) => {
             firstName: user.firstName,
             lastName: user.lastName,
             role: user.role,
+            profilePhoto: user.profilePhoto,
+            phone: user.phone,
+            zipCode: user.zipCode,
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
         }

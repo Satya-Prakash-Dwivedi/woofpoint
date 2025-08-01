@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "safeareacontext_autolinked_build",
+		"source" : "/Users/satya/Documents/coding/React-Native/woofpoint/client/node_modules/react-native-safe-area-context/android/src/main/jni"
+	}
+}
