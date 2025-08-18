@@ -4,6 +4,7 @@ import Role from "./src/screens/Role";
 import Login from "./src/screens/Login";
 import Signup from "./src/screens/Signup";
 import HomeScreen from "./src/screens/HomeOwner";
+import UploadPhoto from "./src/screens/UploadPhoto";
 
 // Navigation
 import { NavigationContainer } from "@react-navigation/native"
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   Signup: undefined;
   Role: undefined;
   HomeScreen: undefined;
+  UploadPhoto: { token: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -54,6 +56,11 @@ function app() {
             title: ""
           }}
         />
+        <Stack.Screen name="UploadPhoto"
+          component={UploadPhoto}
+          options={{
+            title: ""
+          }} />
       </Stack.Navigator>
     </NavigationContainer>
   )

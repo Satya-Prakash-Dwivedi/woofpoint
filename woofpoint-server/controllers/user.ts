@@ -1,82 +1,60 @@
 import bcrypt from "bcrypt"
 import { Request, Response } from "express";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import jwt from "jsonwebtoken"
 import User from "../models/user";
+import s3 from "../utils/s3";
+
+require('dotenv').config();
+
+interface AuthRequest extends Request {
+    user?: { id: string; role?: string };
+}
 
 export const signup = async (req: Request, res: Response) => {
-    const { email, firstName, lastName, password, role, phone, zipCode } = req.body;
-    const profilePhoto = (req.file as any)?.location;  // multer-s3 puts URL in location
-
     try {
-        // First check if user already exists or not
+        const { email, password, role, firstName, lastName, phone, zipCode } = req.body;
+
+        // check if user already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({
-                error: "User with this email already exists"
-            })
+            return res.status(400).json({ error: "User already exists" });
         }
-        // Hash the password
-        const hashed = await bcrypt.hash(password, 10);
 
-        // Create User with all the required fields
-        const user = await User.create({
+        // hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // create new user
+        const user = new User({
             email,
-            password: hashed,
+            password: hashedPassword,
+            role,
             firstName,
             lastName,
-            role: role || 'owner', // default role is owner
-            profilePhoto,
             phone,
             zipCode,
         });
 
-        const token = jwt.sign(     // Payload will containe user id and role
-            { _id: user._id, role: user.role },
-            process.env.JWT_SECRET as string,
-            { expiresIn: '7d' });
+        await user.save();
 
-        const userResponse = {     // Here we exclude password from response, only send safe user data back to client
-            _id: user._id,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            role: user.role,
-            profilePhoto: user.profilePhoto,
-            phone: user.phone,
-            zipCode: user.zipCode,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt
-        }
+        // sign jwt token - FIXED: Make consistent with login
+        const token = jwt.sign(
+            {
+                _id: user._id,      // Changed from 'id' to '_id' to match login
+                role: user.role,
+                email: user.email
+            },
+            process.env.JWT_SECRET!,
+            { expiresIn: "7d" }
+        );
 
-        res.status(201).json({
-            user: userResponse,
-            token,
-            message: "User created successfully"
-        })
-    } catch (error: any) {
-        console.error('Signup error:', error);
-
-        // Handle MongoDB duplicate key error
-        if (error.code === 11000) {
-            return res.status(400).json({
-                error: "Email already exists in database"
-            });
-        }
-
-        // Handle Mongoose validation errors like missing fields and invalid data
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({
-                error: "Validation failed",
-                details: Object.values(error.errors).map((err: any) => err.message)
-            });
-        }
-
-        res.status(500).json({       // Internal server error, shows error details in development for security
-            error: "Signup failed",
-            details: process.env.NODE_ENV === 'development' ? error.message : undefined
-        });
+        return res.status(201).json({ token });
+    } catch (err) {
+        console.error("Signup error:", err);
+        res.status(500).json({ error: "Server error" });
     }
-}
+};
 
 export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
@@ -172,3 +150,60 @@ export const login = async (req: Request, res: Response) => {
         });
     }
 }
+
+export const uploadPhoto = async (req: AuthRequest, res: Response) => {
+    try {
+
+        console.log('Upload photo started');
+        console.log('User:', req.user);
+        console.log('File:', req.file ? 'File received' : 'No file');
+
+        if (!req.user?.id) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const { mimetype, originalname, buffer } = req.file;
+        const key = `profile-photos/${req.user.id}-${Date.now()}-${originalname || "photo.jpg"}`;
+
+        // Upload file to S3 with the file buffer
+        const command = new PutObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: key,
+            Body: buffer, // This was missing in your original code!
+            ContentType: mimetype,
+            // ACL: "public-read", // Uncomment if you want public access
+        });
+
+        await s3.send(command);
+
+        // Construct the public URL
+        const photoUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+        // Update user profilePhoto in MongoDB
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { profilePhoto: photoUrl },
+            { new: true, projection: "-password" }
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        return res.status(200).json({
+            message: "Profile photo uploaded successfully",
+            photoUrl,
+            user,
+        });
+    } catch (err) {
+        console.error("uploadPhoto error:", err);
+        return res.status(500).json({
+            error: "Server error",
+            details: process.env.NODE_ENV === 'development' ? (err as Error).message : undefined
+        });
+    }
+};

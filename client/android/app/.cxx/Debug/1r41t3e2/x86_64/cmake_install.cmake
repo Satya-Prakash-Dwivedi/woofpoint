@@ -47,6 +47,7 @@ if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   include("/Users/satya/Documents/coding/React-Native/woofpoint/client/android/app/.cxx/Debug/1r41t3e2/x86_64/RNImagePickerSpec_autolinked_build/cmake_install.cmake")
   include("/Users/satya/Documents/coding/React-Native/woofpoint/client/android/app/.cxx/Debug/1r41t3e2/x86_64/safeareacontext_autolinked_build/cmake_install.cmake")
   include("/Users/satya/Documents/coding/React-Native/woofpoint/client/android/app/.cxx/Debug/1r41t3e2/x86_64/rnscreens_autolinked_build/cmake_install.cmake")
+  include("/Users/satya/Documents/coding/React-Native/woofpoint/client/android/app/.cxx/Debug/1r41t3e2/x86_64/RNVectorIconsSpec_autolinked_build/cmake_install.cmake")
 
 endif()
 
