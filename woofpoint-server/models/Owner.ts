@@ -2,17 +2,17 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IDogOwner extends Document {
     userId: mongoose.Types.ObjectId;
-    location: {
-        address: string;
-        city: string;
-        state: string;
-        zipCode: string;
+    location?: {
+        address?: string;
+        city?: string;
+        state?: string;
+        zipCode?: string;
     };
     dogs: Array<{
-        name: string;
-        breed: string;
-        age: number;
-        size: 'small' | 'medium' | 'large';
+        name?: string;
+        breed?: string;
+        age?: number;
+        size?: 'small' | 'medium' | 'large';
         photos: string[];
     }>;
     bookingHistory: mongoose.Types.ObjectId[];
@@ -28,16 +28,16 @@ const DogOwnerSchema: Schema<IDogOwner> = new Schema({
         unique: true
     },
     location: {
-        address: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        zipCode: { type: String, required: true },
+        address: { type: String, default: "" },
+        city: { type: String, default: "" },
+        state: { type: String, default: "" },
+        zipCode: { type: String, default: "" },
     },
     dogs: [{
-        name: { type: String, required: true },
-        breed: { type: String, required: true },
-        age: { type: Number, required: true },
-        size: { type: String, enum: ['small', 'medium', 'large'], required: true },
+        name: { type: String, default: "" },
+        breed: { type: String, default: "" },
+        age: { type: Number, default: 0 },
+        size: { type: String, enum: ['small', 'medium', 'large'], default: 'small' },
         photos: [{ type: String }]
     }],
     bookingHistory: [{

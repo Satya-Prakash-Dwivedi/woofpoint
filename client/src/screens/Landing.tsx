@@ -65,31 +65,31 @@ const Landing = ({ navigation }: LandingProps) => {
                         </View>
                     </View>
                     <View style={styles.Bottom}>
-                        <TouchableOpacity style={styles.BottomButton}>
-                            <Button
-                                color={'white'}
-                                title='Explore Trainers'
-                                onPress={() => navigation.navigate("HomeScreen")}
-                            />
+                        <TouchableOpacity
+                            style={styles.BottomButton}
+                            onPress={() => navigation.navigate("HomeScreen")}
+                        >
+                            <Text style={styles.BottomText}>
+                                Explore Trainers
+                            </Text>
                         </TouchableOpacity>
+
                         <View style={{ flex: 2, flexDirection: 'row', gap: 10 }}>
                             <TouchableOpacity
-                                style={[styles.BottomAuth]}
+                                style={styles.BottomAuth}
+                                onPress={() => navigation.navigate("Login")}
                             >
-                                <Button
-                                    color={'white'}
-                                    title='Log In'
-                                    onPress={() => navigation.navigate("Login")}
-                                />
+                                <Text style={styles.BottomText}>
+                                    Log In
+                                </Text>
                             </TouchableOpacity>
                             <TouchableOpacity
-                                style={[styles.BottomAuth]}
+                                style={styles.BottomAuth}
+                                onPress={() => navigation.navigate("Signup")}
                             >
-                                <Button
-                                    color={'white'}
-                                    title='Sign Up'
-                                    onPress={() => navigation.navigate("Signup")}
-                                />
+                                <Text style={styles.BottomText}>
+                                    Sign Up
+                                </Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
         width: 350,
         borderRadius: 20,
         borderWidth: 4,
-        borderColor: 'orange',
+        borderColor: '#E97B47',
         margin: 20
     },
     subHeadingtwo: {
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     cardCircle: {
         height: 50,
         width: 50,
-        backgroundColor: 'orange',
+        backgroundColor: '#E97B47',
         borderRadius: 50,
         justifyContent: 'center',
         alignItems: 'center',
@@ -173,8 +173,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
     },
     BottomButton: {
-        backgroundColor: 'orange',
+        backgroundColor: '#E97B47',
         paddingHorizontal: 10,
+        paddingVertical: 10,
         width: 300,
         alignItems: 'center',
         borderRadius: 10
@@ -183,13 +184,16 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 18,
         fontWeight: 600,
-        textAlign: 'center'
+        textAlign: 'center',
     },
     BottomAuth: {
-        backgroundColor: 'orange',
+        backgroundColor: '#E97B47',
         width: 145,
         marginTop: 10,
         borderRadius: 10,
-        color: 'white'
+        color: 'white',
+        textAlign: 'center',
+        justifyContent: 'center',
+        paddingVertical: 7
     },
 })

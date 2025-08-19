@@ -77,9 +77,9 @@ const Login = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
+            {/* <View style={styles.header}>
                 <Text style={styles.heading}>Log In</Text>
-            </View>
+            </View> */}
             <View style={styles.topSection}>
                 <Text style={styles.topSectionHeading}>Welcome Back</Text>
                 <Text style={styles.topSectionText}>Log in to continue</Text>
@@ -151,7 +151,8 @@ const styles = StyleSheet.create({
     },
     topSectionHeading: {
         fontSize: 30,
-        fontWeight: 600
+        fontWeight: 600,
+        color: '#E97B47',
     },
     topSectionText: {
         fontSize: 16,

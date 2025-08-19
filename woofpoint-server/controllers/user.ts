@@ -4,6 +4,9 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import jwt from "jsonwebtoken"
 import User from "../models/user";
 import s3 from "../utils/s3";
+import DogOwner from "../models/owner";
+import DogTrainer from "../models/trainer";
+
 
 require('dotenv').config();
 
@@ -36,7 +39,16 @@ export const signup = async (req: Request, res: Response) => {
             zipCode,
         });
 
+        console.log(user)
+
         await user.save();
+
+        // create role-specific profile
+        if (user.role === "owner") {
+            await DogOwner.create({ userId: user._id });
+        } else if (user.role === "trainer") {
+            await DogTrainer.create({ userId: user._id });
+        }
 
         // sign jwt token - FIXED: Make consistent with login
         const token = jwt.sign(
