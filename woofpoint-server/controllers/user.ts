@@ -2,10 +2,10 @@ import bcrypt from "bcrypt"
 import { Request, Response } from "express";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import jwt from "jsonwebtoken"
-import User from "../models/user";
+import User from "../models/user.model";
 import s3 from "../utils/s3";
-import DogOwner from "../models/owner";
-import DogTrainer from "../models/trainer";
+import DogOwner from "../models/owner.model";
+import DogTrainer from "../models/trainer.model";
 
 
 require('dotenv').config();
@@ -72,8 +72,6 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     try {
-        console.log('Login endpoint hit');
-        console.log('Request body:', req.body);
 
         // Validate input
         if (!email || !password) {
@@ -85,8 +83,6 @@ export const login = async (req: Request, res: Response) => {
         // Clean and normalize email
         const cleanEmail = email.toLowerCase().trim();
 
-        console.log('Searching for user with email:', cleanEmail);
-
         // Find user by email
         const user = await User.findOne({ email: cleanEmail });
         if (!user) {
@@ -96,23 +92,12 @@ export const login = async (req: Request, res: Response) => {
             });
         }
 
-        console.log('User found:', {
-            id: user._id,
-            email: user.email,
-            hasPassword: !!user.password
-        });
-
         // Clean password (remove any whitespace)
         const cleanPassword = password.trim();
 
-        console.log('Comparing passwords...');
-        console.log('Input password length:', cleanPassword.length);
-        console.log('Stored password hash length:', user.password.length);
 
         // Compare password
         const isPasswordValid = await bcrypt.compare(cleanPassword, user.password);
-
-        console.log('Password comparison result:', isPasswordValid);
 
         if (!isPasswordValid) {
             console.log('Password validation failed');
@@ -120,8 +105,6 @@ export const login = async (req: Request, res: Response) => {
                 error: "Invalid email or password"  // Changed to generic message for security
             });
         }
-
-        console.log('Password validated successfully');
 
         // Generate JWT token
         const token = jwt.sign(
@@ -145,12 +128,11 @@ export const login = async (req: Request, res: Response) => {
             updatedAt: user.updatedAt
         };
 
-        console.log('Login successful for user:', user.email);
-
         res.status(200).json({
             user: userResponse,
             token,
-            message: "Login successful"
+            message: "Login successful",
+            role: user.role
         });
 
     } catch (error: any) {
@@ -163,12 +145,33 @@ export const login = async (req: Request, res: Response) => {
     }
 }
 
+export const logout = async (req: AuthRequest, res: Response) => {
+    try {
+        // In a stateless JWT system, we can't invalidate tokens on the server side
+        // The logout is handled on the client side by removing the token
+        // But we can log the logout event for security/audit purposes
+
+        const userId = req.user?.id;
+        const userEmail = req.user ? await User.findById(userId, 'email') : null;
+
+        console.log(`User logout: ${userEmail?.email || 'Unknown'} at ${new Date().toISOString()}`);
+
+        res.status(200).json({
+            message: "Logged out successfully"
+        });
+
+    } catch (error: any) {
+        console.error('Logout error:', error);
+        res.status(500).json({
+            error: "Logout failed",
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    }
+};
+
+
 export const uploadPhoto = async (req: AuthRequest, res: Response) => {
     try {
-
-        console.log('Upload photo started');
-        console.log('User:', req.user);
-        console.log('File:', req.file ? 'File received' : 'No file');
 
         if (!req.user?.id) {
             return res.status(401).json({ error: "Unauthorized" });

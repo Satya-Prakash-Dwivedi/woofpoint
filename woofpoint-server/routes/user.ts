@@ -1,6 +1,6 @@
 import express from "express"
 import multer from "multer";
-import { signup, login } from "../controllers/user"
+import { signup, login, logout } from "../controllers/user"
 import { authMiddleware } from "../middleware/auth";
 import { uploadPhoto } from "../controllers/user";
 
@@ -39,6 +39,7 @@ const handleUpload = (req: express.Request, res: express.Response, next: express
 
 router.post('/signup', signup);
 router.post('/login', login);
+router.post('/logout', logout)
 router.post("/upload-photo", authMiddleware, handleUpload, uploadPhoto);
 
 export default router;

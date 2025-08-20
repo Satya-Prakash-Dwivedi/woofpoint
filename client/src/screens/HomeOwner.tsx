@@ -7,6 +7,7 @@ import {
     ScrollView,
     StyleSheet,
     SafeAreaView,
+    Image,
     ImageSourcePropType,
 } from 'react-native';
 
@@ -40,7 +41,7 @@ interface BottomNavItemProps {
     onPress?: () => void;
 }
 
-const HomeScreen: React.FC = () => {
+const OwnerHome: React.FC = () => {
     const [searchText, setSearchText] = useState<string>('');
     const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');
     const [selectedDistance, setSelectedDistance] = useState<string>('');
@@ -109,6 +110,17 @@ const HomeScreen: React.FC = () => {
         // Implement bottom navigation logic
     };
 
+    // Navigation icons mapping
+    const getNavIcon = (title: string): string => {
+        const iconMap: { [key: string]: string } = {
+            'Home': 'https://cdn-icons-png.flaticon.com/512/1946/1946488.png',
+            'Bookings': 'https://cdn-icons-png.flaticon.com/512/747/747310.png',
+            'Messages': 'https://cdn-icons-png.flaticon.com/512/134/134718.png',
+            'Profile': 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png',
+        };
+        return iconMap[title] || iconMap['Home'];
+    };
+
     const FilterButton: React.FC<FilterButtonProps> = ({ title, value, onPress }) => (
         <TouchableOpacity style={styles.filterButton} onPress={onPress} activeOpacity={0.7}>
             <Text style={styles.filterText}>{title}</Text>
@@ -148,7 +160,13 @@ const HomeScreen: React.FC = () => {
             onPress={onPress || (() => handleBottomNavPress(title))}
             activeOpacity={0.7}
         >
-            <View style={[styles.navIcon, isActive && styles.activeNavIcon]} />
+            <Image
+                source={{ uri: getNavIcon(title) }}
+                style={[
+                    styles.navIcon,
+                    { tintColor: isActive ? '#333' : '#CCC' }
+                ]}
+            />
             <Text style={[styles.navText, isActive && styles.activeNavText]}>
                 {title}
             </Text>
@@ -164,9 +182,10 @@ const HomeScreen: React.FC = () => {
                     onPress={handleMenuPress}
                     activeOpacity={0.7}
                 >
-                    <View style={styles.menuLine} />
-                    <View style={styles.menuLine} />
-                    <View style={styles.menuLine} />
+                    <Image
+                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png" }}
+                        style={styles.menuIcon}
+                    />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Home</Text>
                 <View style={styles.headerSpacer} />
@@ -254,12 +273,10 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 4,
     },
-    menuLine: {
-        width: 20,
-        height: 2,
-        backgroundColor: '#333',
-        marginVertical: 2,
-        borderRadius: 1,
+    menuIcon: {
+        width: 24,
+        height: 24,
+        tintColor: '#333',
     },
     headerTitle: {
         flex: 1,
@@ -420,11 +437,6 @@ const styles = StyleSheet.create({
     navIcon: {
         width: 24,
         height: 24,
-        backgroundColor: '#CCC',
-        borderRadius: 4,
-    },
-    activeNavIcon: {
-        backgroundColor: '#333',
     },
     navText: {
         fontSize: 12,
@@ -437,4 +449,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HomeScreen;
+export default OwnerHome;

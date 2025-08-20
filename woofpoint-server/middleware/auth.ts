@@ -18,7 +18,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 
         // Handle both 'id' and '_id' formats for backwards compatibility
         req.user = {
-            id: decoded._id || decoded.id,
+            id: decoded.id || decoded._id,
             role: decoded.role
         };
 

@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { View, Button, Image, Alert, StyleSheet } from "react-native";
 import { launchImageLibrary, Asset } from "react-native-image-picker";
 import axios from "axios";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../App";
 
-type Props = {
-    navigation: any;
-    route: { params: { token: string } };
-};
+type Props = NativeStackScreenProps<RootStackParamList, "UploadPhoto">;
 
 const UploadPhoto: React.FC<Props> = ({ navigation, route }) => {
+    const { token, role } = route.params;
     const [photo, setPhoto] = useState<Asset | null>(null);
     const [uploading, setUploading] = useState(false);
 
@@ -58,11 +58,12 @@ const UploadPhoto: React.FC<Props> = ({ navigation, route }) => {
             console.log('Upload response:', res.data);
             Alert.alert("Success", "Photo uploaded successfully");
 
-            // FIX: Navigate to an existing screen or go back
-            // Replace "Home" with a screen that exists in your navigator
-            // navigation.navigate("Home"); // Comment this out or replace with correct screen
-            navigation.goBack(); // Or use this to go back to previous screen
-
+            // Redirect based on role
+            if (route.params.role === "trainer") {
+                navigation.replace("TrainerHome", { token });
+            } else {
+                navigation.replace("OwnerHome", { token });
+            }
         } catch (err: any) {
             console.error('Upload error:', err);
             const errorMessage = err.response?.data?.error ||

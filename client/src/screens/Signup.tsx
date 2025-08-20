@@ -27,34 +27,114 @@ const Signup: React.FC = () => {
     const [phone, setPhone] = useState('');
     const [zipCode, setZipCode] = useState('');
 
+    // Enhanced validation functions
+    const validateEmail = (email: string): boolean => {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email.trim());
+    };
+
+    const validatePassword = (password: string): { isValid: boolean; message?: string } => {
+        if (password.length < 8) {
+            return { isValid: false, message: 'Password must be at least 8 characters long' };
+        }
+        if (!/(?=.*[a-z])/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+        }
+        if (!/(?=.*[A-Z])/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+        }
+        if (!/(?=.*\d)/.test(password)) {
+            return { isValid: false, message: 'Password must contain at least one number' };
+        }
+        return { isValid: true };
+    };
+
+    const validateName = (name: string): boolean => {
+        return name.trim().length >= 2 && /^[a-zA-Z\s'-]+$/.test(name.trim());
+    };
+
+    const validatePhone = (phone: string): boolean => {
+        const cleanPhone = phone.replace(/\D/g, '');
+        return cleanPhone.length === 10;
+    };
+
+    const validateZipCode = (zipCode: string): boolean => {
+        const cleanZip = zipCode.replace(/\D/g, '');
+        return cleanZip.length >= 5 && cleanZip.length <= 6;
+    };
+
     const handleSignUp = async () => {
-        // Validation logic remains unchanged for correctness
-        if (!firstName || !lastName || !email || !password || !phone || !zipCode || !roleId) {
-            Alert.alert('Validation Error', 'Please fill all fields');
+        // Comprehensive validation
+        if (!firstName.trim()) {
+            Alert.alert('Validation Error', 'First name is required');
             return;
         }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!validateName(firstName)) {
+            Alert.alert('Validation Error', 'First name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes');
+            return;
+        }
+
+        if (!lastName.trim()) {
+            Alert.alert('Validation Error', 'Last name is required');
+            return;
+        }
+        if (!validateName(lastName)) {
+            Alert.alert('Validation Error', 'Last name must be at least 2 characters and contain only letters, spaces, hyphens, and apostrophes');
+            return;
+        }
+
+        if (!email.trim()) {
+            Alert.alert('Validation Error', 'Email is required');
+            return;
+        }
+        if (!validateEmail(email)) {
             Alert.alert('Validation Error', 'Please enter a valid email address');
             return;
         }
-        if (password.length < 6) {
-            Alert.alert('Validation Error', 'Password must be at least 6 characters long');
+
+        if (!password) {
+            Alert.alert('Validation Error', 'Password is required');
             return;
         }
-        if (!/^\d{10}$/.test(phone)) {
-            Alert.alert('Validation Error', 'Phone must be a 10-digit number');
+        const passwordValidation = validatePassword(password);
+        if (!passwordValidation.isValid) {
+            Alert.alert('Validation Error', passwordValidation.message || 'Invalid password');
             return;
         }
-        if (!/^\d{5,6}$/.test(zipCode)) {
+
+        if (!phone.trim()) {
+            Alert.alert('Validation Error', 'Phone number is required');
+            return;
+        }
+        if (!validatePhone(phone)) {
+            Alert.alert('Validation Error', 'Please enter a valid 10-digit phone number');
+            return;
+        }
+
+        if (!zipCode.trim()) {
+            Alert.alert('Validation Error', 'Zip code is required');
+            return;
+        }
+        if (!validateZipCode(zipCode)) {
             Alert.alert('Validation Error', 'Zip code must be 5 or 6 digits');
+            return;
+        }
+
+        if (!roleId) {
+            Alert.alert('Validation Error', 'Please select whether you are a Dog Owner or Dog Trainer');
             return;
         }
 
         setIsLoading(true);
         try {
             const response = await axios.post("http://localhost:3001/api/auth/signup", {
-                firstName, lastName, email, password, phone, zipCode, role: roleId
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+                email: email.toLowerCase().trim(),
+                password,
+                phone: phone.replace(/\D/g, ''), // Clean phone number
+                zipCode: zipCode.replace(/\D/g, ''), // Clean zip code
+                role: roleId
             });
 
             const token: string | undefined = response?.data?.token;
@@ -70,8 +150,12 @@ const Signup: React.FC = () => {
                     // clear
                     setFirstName(''); setLastName(''); setEmail(''); setPassword('');
                     setPhone(''); setZipCode(''); setRoleId(undefined);
+
                     // ✅ go to UploadPhoto with token
-                    navigation.replace('UploadPhoto', { token });
+                    navigation.navigate("UploadPhoto", {
+                        token: response.data.token,
+                        role: roleId as "owner" | "trainer",
+                    });
                 }
             }]);
 
@@ -115,6 +199,7 @@ const Signup: React.FC = () => {
                                 placeholderTextColor={PLACEHOLDER}
                                 value={firstName}
                                 onChangeText={setFirstName}
+                                maxLength={50}
                             />
                             <TextInput
                                 style={styles.input}
@@ -122,6 +207,7 @@ const Signup: React.FC = () => {
                                 placeholderTextColor={PLACEHOLDER}
                                 value={lastName}
                                 onChangeText={setLastName}
+                                maxLength={50}
                             />
                             <TextInput
                                 style={styles.input}
@@ -131,30 +217,35 @@ const Signup: React.FC = () => {
                                 onChangeText={setEmail}
                                 keyboardType="email-address"
                                 autoCapitalize="none"
+                                autoCorrect={false}
+                                maxLength={100}
                             />
                             <TextInput
                                 style={styles.input}
-                                placeholder="Password"
+                                placeholder="Password (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
                                 placeholderTextColor={PLACEHOLDER}
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry
+                                maxLength={50}
                             />
                             <TextInput
                                 style={styles.input}
                                 placeholder="10-digit phone"
                                 placeholderTextColor={PLACEHOLDER}
                                 value={phone}
-                                onChangeText={setPhone}
+                                onChangeText={(text) => setPhone(text.replace(/[^0-9]/g, ''))}
                                 keyboardType="phone-pad"
+                                maxLength={10}
                             />
                             <TextInput
                                 style={styles.input}
                                 placeholder="Zip/Postal code"
                                 placeholderTextColor={PLACEHOLDER}
                                 value={zipCode}
-                                onChangeText={setZipCode}
+                                onChangeText={(text) => setZipCode(text.replace(/[^0-9]/g, ''))}
                                 keyboardType="number-pad"
+                                maxLength={6}
                             />
                         </View>
 
