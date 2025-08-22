@@ -1,8 +1,8 @@
 import express from "express"
 import mongoose from "mongoose"
 import cors from "cors"
-import userRoutes from "./routes/user"
-import trainerRoutes from "./routes/trainer"
+import userRoutes from "./routes/user.routes"
+import trainerRoutes from "./routes/trainer.routes"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -15,7 +15,6 @@ app.use(express.json())
 
 app.use("/api/auth", userRoutes)
 app.use("/api/trainer", trainerRoutes)
-console.log("Trainer routes mounted ✅");
 
 // Add this to test basic connectivity
 app.get('/api/test', (req, res) => {

@@ -2,6 +2,9 @@
 
 import User from "../models/user.model";
 import Trainer from "../models/trainer.model";
+import s3 from "../utils/s3";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const getTrainerProfile = async (req: any, res: any) => {
     try {
@@ -9,16 +12,37 @@ export const getTrainerProfile = async (req: any, res: any) => {
         const user = await User.findById(userId).lean();
         const trainer = await Trainer.findOne({ userId }).lean();
 
+        let profilePhotoUrl = "";
+        if (user?.profilePhoto) {
+            // extract S3 key from full URL
+            const key = user.profilePhoto.split(".com/")[1];
+
+            const command = new GetObjectCommand({
+                Bucket: "woofpoint-private",
+                Key: key,
+            });
+
+            // ✅ generate signed URL (valid for 1 hour)
+            profilePhotoUrl = await getSignedUrl(s3, command, { expiresIn: 3600 });
+        }
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
 
         // Combine user data with nested trainer data for the frontend
         const profile = {
-            ...user,
-            bio: trainer?.portfolio?.bio || "",
-            specialization: trainer?.portfolio?.specializations?.[0] || "", // Sending the first specialization
-            experience: trainer?.businessInfo?.yearsOfExperience?.toString() || "0",
+            firstName: user.firstName,
+            lastName: user.lastName,
+            phone: user.phone,
+            profilePhoto: profilePhotoUrl, // ✅ force keep this
+            zipCode: user.zipCode,
+            email: user.email,
+
+            // trainer-specific
+            businessInfo: trainer?.businessInfo || { yearsOfExperience: 0, certifications: [] },
+            services: trainer?.services || [],
+            location: trainer?.location || { address: "", city: "", state: "" },
+            portfolio: trainer?.portfolio || { bio: "", specializations: [] },
         };
 
         res.json(profile);
@@ -28,13 +52,24 @@ export const getTrainerProfile = async (req: any, res: any) => {
     }
 };
 
-
 export const updateTrainerProfile = async (req: any, res: any) => {
     try {
-        const userId = req.user.id;
-        const { firstName, lastName, phone, zipCode, specialization, bio, experience } = req.body;
+        const userId = req.user.id; // from authMiddleware
 
-        // 1. Update the User model
+        const {
+            firstName,
+            lastName,
+            phone,
+            zipCode,
+            yearsOfExperience,
+            certifications,
+            services,
+            bio,
+            specializations,
+            location
+        } = req.body;
+
+        // ✅ Update User basic details
         const user = await User.findByIdAndUpdate(
             userId,
             { firstName, lastName, phone, zipCode },
@@ -45,25 +80,80 @@ export const updateTrainerProfile = async (req: any, res: any) => {
             return res.status(404).json({ error: "User not found" });
         }
 
-        // 2. Prepare the update object for the Trainer model using dot notation
-        const trainerUpdateData = {
-            'portfolio.bio': bio,
-            // Your schema expects an array of strings for specializations
-            'portfolio.specializations': specialization ? [specialization] : [],
-            // Your schema uses 'yearsOfExperience' and it's a number
-            'businessInfo.yearsOfExperience': Number(experience) || 0
+        // ✅ Certifications (only "name")
+        const formattedCertifications = (certifications || []).map((c: any) => ({
+            name: c?.name || ""
+        }));
+
+        // ✅ Services
+        const formattedServices = (services || []).map((s: any) => ({
+            type: s?.type || "",
+            description: s?.description || "",
+            duration: s?.duration || 0,
+            price: s?.price || 0
+        }));
+
+        // ✅ Specializations validation (max 3, must match a service type — case-insensitive)
+        let validSpecializations: string[] = [];
+        if (specializations && Array.isArray(specializations)) {
+            const serviceTypes = formattedServices
+                .map((s: any) => s?.type?.toLowerCase().trim())
+                .filter(Boolean); // remove empty strings
+
+            validSpecializations = specializations.filter((spec: string) =>
+                serviceTypes.includes(spec?.toLowerCase().trim())
+            );
+
+            if (validSpecializations.length > 3) {
+                validSpecializations = validSpecializations.slice(0, 3);
+            }
+        }
+
+        // ✅ Location (default empty object if not provided)
+        const formattedLocation = {
+            address: location?.address || "",
+            city: location?.city || "",
+            state: location?.state || "",
         };
 
-        // 3. Update the Trainer model
+        // ✅ Update trainer profile
         const trainer = await Trainer.findOneAndUpdate(
             { userId },
-            { $set: trainerUpdateData }, // Use $set to update nested fields
-            { new: true, upsert: true } // upsert: true creates the document if it doesn't exist
+            {
+                "businessInfo.yearsOfExperience": yearsOfExperience || 0,
+                "businessInfo.certifications": formattedCertifications,
+                services: formattedServices,
+                "portfolio.bio": bio || "",
+                "portfolio.specializations": validSpecializations,
+                location: formattedLocation
+            },
+            { new: true, upsert: true }
         );
 
-        res.json({ user, trainer });
+        // ✅ Ensure response always has safe defaults
+        res.json({
+            message: "Trainer profile updated successfully",
+            user,
+            trainer: {
+                ...trainer.toObject(),
+                businessInfo: {
+                    yearsOfExperience: trainer.businessInfo?.yearsOfExperience || 0,
+                    certifications: trainer.businessInfo?.certifications || []
+                },
+                services: trainer.services || [],
+                location: trainer.location || {
+                    address: "",
+                    city: "",
+                    state: "",
+                },
+                portfolio: {
+                    bio: trainer.portfolio?.bio || "",
+                    specializations: trainer.portfolio?.specializations || []
+                }
+            }
+        });
     } catch (err) {
-        console.error("Error updating trainer profile:", err);
-        res.status(500).json({ error: "Server error while updating profile" });
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
     }
 };

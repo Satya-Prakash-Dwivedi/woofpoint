@@ -21,8 +21,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
             id: decoded.id || decoded._id,
             role: decoded.role
         };
-
-        console.log('Authenticated user:', req.user); // Debug log
         next();
     } catch (error) {
         console.error('Auth middleware error:', error);

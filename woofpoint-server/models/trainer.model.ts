@@ -3,14 +3,9 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IDogTrainer extends Document {
     userId: mongoose.Types.ObjectId;
     businessInfo?: {
-        businessName?: string;
-        licenseNumber?: string;
         yearsOfExperience: number;
         certifications: Array<{
             name?: string;
-            issuedBy?: string;
-            issuedDate?: Date;
-            expiryDate?: Date;
         }>;
     };
     services: Array<{
@@ -18,22 +13,11 @@ export interface IDogTrainer extends Document {
         description?: string;
         duration?: number;
         price?: number;
-        isActive: boolean;
     }>;
     location?: {
         address?: string;
         city?: string;
         state?: string;
-        zipCode?: string;
-    };
-    availability?: {
-        schedule: Array<{
-            day?: string;
-            startTime?: string;
-            endTime?: string;
-            isAvailable: boolean;
-        }>;
-        timeZone?: string;
     };
     ratings: {
         averageRating: number;
@@ -42,7 +26,6 @@ export interface IDogTrainer extends Document {
     portfolio?: {
         bio?: string;
         specializations: string[];
-        photos: string[];
     };
     isVerified: boolean;
     bookingHistory: mongoose.Types.ObjectId[];
@@ -58,14 +41,9 @@ const DogTrainerSchema: Schema<IDogTrainer> = new Schema({
         unique: true
     },
     businessInfo: {
-        businessName: { type: String, default: "" },
-        licenseNumber: { type: String, default: "" },
         yearsOfExperience: { type: Number, default: 0 },
         certifications: [{
             name: { type: String, default: "" },
-            issuedBy: { type: String, default: "" },
-            issuedDate: { type: Date, default: null },
-            expiryDate: { type: Date, default: null }
         }]
     },
     services: [{
@@ -73,22 +51,11 @@ const DogTrainerSchema: Schema<IDogTrainer> = new Schema({
         description: { type: String, default: "" },
         duration: { type: Number, default: 0 },
         price: { type: Number, default: 0 },
-        isActive: { type: Boolean, default: true }
     }],
     location: {
         address: { type: String, default: "" },
         city: { type: String, default: "" },
         state: { type: String, default: "" },
-        zipCode: { type: String, default: "" },
-    },
-    availability: {
-        schedule: [{
-            day: { type: String, default: "" },
-            startTime: { type: String, default: "" },
-            endTime: { type: String, default: "" },
-            isAvailable: { type: Boolean, default: true }
-        }],
-        timeZone: { type: String, default: "" }
     },
     ratings: {
         averageRating: { type: Number, default: 0 },
@@ -96,8 +63,16 @@ const DogTrainerSchema: Schema<IDogTrainer> = new Schema({
     },
     portfolio: {
         bio: { type: String, default: "" },
-        specializations: [{ type: String }],
-        photos: [{ type: String }]
+        specializations: {
+            type: [String],
+            validate: {
+                validator: function (arr: string[]) {
+                    return arr.length <= 3; // enforce max 3 specializations
+                },
+                message: 'You can select up to 3 specializations only.'
+            },
+            default: []
+        },
     },
     isVerified: { type: Boolean, default: false },
     bookingHistory: [{
