@@ -8,7 +8,6 @@ import {
     SafeAreaView,
     TouchableOpacity,
     Modal,
-    Animated,
     Alert,
 } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -183,7 +182,7 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                     />
                     <Text style={styles.navText}>Messages</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("TrainerProfile")}>
                     <Image
                         source={{ uri: "https://cdn-icons-png.flaticon.com/512/1077/1077114.png" }}
                         style={[styles.navIcon, { tintColor: "gray" }]}
