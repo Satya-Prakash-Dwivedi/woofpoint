@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 import cors from "cors"
 import userRoutes from "./routes/user.routes"
 import trainerRoutes from "./routes/trainer.routes"
+import ownerRoutes from "./routes/owner.routes"
 
 import dotenv from "dotenv"
 dotenv.config()
@@ -15,11 +16,7 @@ app.use(express.json())
 
 app.use("/api/auth", userRoutes)
 app.use("/api/trainer", trainerRoutes)
-
-// Add this to test basic connectivity
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'Server is working!' });
-});
+app.use("/owners", ownerRoutes);
 
 
 mongoose

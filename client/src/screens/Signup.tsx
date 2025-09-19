@@ -192,6 +192,22 @@ const Signup: React.FC = () => {
                         <Text style={styles.title}>Create Account</Text>
                         <Text style={styles.subtitle}>Join Woof Point today!</Text>
 
+                        <Text style={styles.roleTitle}>I am a:</Text>
+                        <View style={styles.roleContainer}>
+                            <TouchableOpacity
+                                onPress={() => setRoleId("owner")}
+                                style={[styles.roleButton, roleId === "owner" && styles.roleButtonActive]}
+                            >
+                                <Text style={[styles.roleText, roleId === "owner" && styles.roleTextActive]}>Dog Owner</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => setRoleId("trainer")}
+                                style={[styles.roleButton, roleId === "trainer" && styles.roleButtonActive]}
+                            >
+                                <Text style={[styles.roleText, roleId === "trainer" && styles.roleTextActive]}>Dog Trainer</Text>
+                            </TouchableOpacity>
+                        </View>
+
                         <View style={styles.inputGroup}>
                             <TextInput
                                 style={styles.input}
@@ -222,7 +238,7 @@ const Signup: React.FC = () => {
                             />
                             <TextInput
                                 style={styles.input}
-                                placeholder="Password (min 8 chars, 1 uppercase, 1 lowercase, 1 number)"
+                                placeholder="Password (min 8 chars, 1 Upper, 1 lower, 1 number)"
                                 placeholderTextColor={PLACEHOLDER}
                                 value={password}
                                 onChangeText={setPassword}
@@ -249,21 +265,7 @@ const Signup: React.FC = () => {
                             />
                         </View>
 
-                        <Text style={styles.roleTitle}>I am a:</Text>
-                        <View style={styles.roleContainer}>
-                            <TouchableOpacity
-                                onPress={() => setRoleId("owner")}
-                                style={[styles.roleButton, roleId === "owner" && styles.roleButtonActive]}
-                            >
-                                <Text style={[styles.roleText, roleId === "owner" && styles.roleTextActive]}>Dog Owner</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => setRoleId("trainer")}
-                                style={[styles.roleButton, roleId === "trainer" && styles.roleButtonActive]}
-                            >
-                                <Text style={[styles.roleText, roleId === "trainer" && styles.roleTextActive]}>Dog Trainer</Text>
-                            </TouchableOpacity>
-                        </View>
+
 
                         <TouchableOpacity
                             style={[styles.signupButton, isLoading && styles.signupButtonDisabled]}

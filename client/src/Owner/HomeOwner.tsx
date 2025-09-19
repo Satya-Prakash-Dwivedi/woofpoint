@@ -10,6 +10,9 @@ import {
     Image,
     ImageSourcePropType,
 } from 'react-native';
+import { HugeiconsIcon } from '@hugeicons/react-native';
+import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon } from '@hugeicons/core-free-icons';
+import Colors from '../constants/Colors';
 
 const PRIMARY: string = '#E97B47';
 const BG: string = '#FEFBF6';
@@ -175,6 +178,7 @@ const OwnerHome: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.container}>
+
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity
@@ -182,9 +186,10 @@ const OwnerHome: React.FC = () => {
                     onPress={handleMenuPress}
                     activeOpacity={0.7}
                 >
-                    <Image
-                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png" }}
-                        style={styles.menuIcon}
+                    <HugeiconsIcon
+                        icon={Menu01Icon}
+                        size={30}
+                        strokeWidth={1.5}
                     />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>Home</Text>
@@ -246,10 +251,27 @@ const OwnerHome: React.FC = () => {
 
             {/* Bottom Navigation */}
             <View style={styles.bottomNav}>
-                <BottomNavItem title="Home" isActive={true} />
-                <BottomNavItem title="Bookings" />
-                <BottomNavItem title="Messages" />
-                <BottomNavItem title="Profile" />
+                <HugeiconsIcon
+                    icon={Home09Icon}
+                    size={30}
+                    strokeWidth={1.5}
+                    color="black"
+                />
+                <HugeiconsIcon
+                    icon={Calendar02Icon}
+                    size={30}
+                    strokeWidth={1.5}
+                    color="black" />
+                <HugeiconsIcon
+                    icon={BubbleChatIcon}
+                    size={30}
+                    strokeWidth={1.5}
+                    color="black" />
+                <HugeiconsIcon
+                    icon={UserCircleIcon}
+                    size={30}
+                    strokeWidth={1.5}
+                    color="black" />
             </View>
         </SafeAreaView>
     );
@@ -427,6 +449,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',
+        gap: 10,
+        justifyContent: 'space-between'
     },
     navItem: {
         flex: 1,
@@ -437,10 +461,11 @@ const styles = StyleSheet.create({
     navIcon: {
         width: 24,
         height: 24,
+        color: Colors.primary,
     },
     navText: {
         fontSize: 12,
-        color: '#999',
+        color: Colors.black,
         fontWeight: '400',
     },
     activeNavText: {

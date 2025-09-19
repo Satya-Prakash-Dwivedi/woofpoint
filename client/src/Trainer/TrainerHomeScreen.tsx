@@ -14,6 +14,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { HugeiconsIcon } from '@hugeicons/react-native';
+import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 
 const PRIMARY = "#E97B47";
 
@@ -115,17 +117,17 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={toggleMenu}>
-                    <Image
-                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/1828/1828859.png" }}
-                        style={styles.headerIcon}
+                    <HugeiconsIcon
+                        icon={Menu01Icon}
+                        size={30}
+                        strokeWidth={1.5}
                     />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Home</Text>
+                <Text style={styles.headerTitle}>Summary</Text>
                 <View style={{ width: 28 }} />
             </View>
 
             {/* Summary */}
-            <Text style={styles.sectionTitle}>Summary</Text>
             <View style={styles.summaryContainer}>
                 <View style={styles.summaryCard}>
                     <Text style={styles.summaryLabel}>Today's Bookings</Text>
@@ -161,33 +163,34 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
 
             {/* Bottom Nav with Images */}
             <View style={styles.navBar}>
-                <TouchableOpacity style={styles.navItem}>
-                    <Image
-                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/1946/1946488.png" }}
-                        style={[styles.navIcon, { tintColor: PRIMARY }]}
+                <TouchableOpacity>
+                    <HugeiconsIcon
+                        icon={Home09Icon}
+                        size={30}
+                        strokeWidth={1.5}
+                        color="black"
                     />
-                    <Text style={[styles.navText, { color: PRIMARY }]}>Home</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Image
-                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/747/747310.png" }}
-                        style={[styles.navIcon, { tintColor: "gray" }]}
-                    />
-                    <Text style={styles.navText}>Bookings</Text>
+                <TouchableOpacity>
+                    <HugeiconsIcon
+                        icon={Calendar02Icon}
+                        size={30}
+                        strokeWidth={1.5}
+                        color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
-                    <Image
-                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/134/134718.png" }}
-                        style={[styles.navIcon, { tintColor: "gray" }]}
-                    />
-                    <Text style={styles.navText}>Messages</Text>
+                <TouchableOpacity>
+                    <HugeiconsIcon
+                        icon={BubbleChatIcon}
+                        size={30}
+                        strokeWidth={1.5}
+                        color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate("TrainerProfile")}>
-                    <Image
-                        source={{ uri: "https://cdn-icons-png.flaticon.com/512/1077/1077114.png" }}
-                        style={[styles.navIcon, { tintColor: "gray" }]}
-                    />
-                    <Text style={styles.navText}>Profile</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("TrainerProfile")}>
+                    <HugeiconsIcon
+                        icon={UserCircleIcon}
+                        size={30}
+                        strokeWidth={1.5}
+                        color="black" />
                 </TouchableOpacity>
             </View>
 
@@ -207,37 +210,25 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                         <View style={styles.menuHeader}>
                             <Text style={styles.menuTitle}>Menu</Text>
                             <TouchableOpacity onPress={() => setIsMenuVisible(false)}>
-                                <Image
-                                    source={{ uri: "https://cdn-icons-png.flaticon.com/512/1828/1828778.png" }}
-                                    style={styles.closeIcon}
-                                />
+                                <HugeiconsIcon icon={CancelCircleIcon} />
                             </TouchableOpacity>
                         </View>
 
                         <View style={styles.menuItems}>
                             <TouchableOpacity style={styles.menuItem} onPress={handleEditProfile}>
-                                <Image
-                                    source={{ uri: "https://cdn-icons-png.flaticon.com/512/1159/1159633.png" }}
-                                    style={styles.menuIcon}
-                                />
+                                <HugeiconsIcon icon={FileEditIcon} />
                                 <Text style={styles.menuItemText}>Edit Profile</Text>
-                                <Image
-                                    source={{ uri: "https://cdn-icons-png.flaticon.com/512/271/271228.png" }}
-                                    style={styles.arrowIcon}
-                                />
+                                <HugeiconsIcon icon={ArrowRight01Icon} />
                             </TouchableOpacity>
 
                             <View style={styles.menuDivider} />
 
                             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-                                <Image
-                                    source={{ uri: "https://cdn-icons-png.flaticon.com/512/1828/1828490.png" }}
-                                    style={[styles.menuIcon, { tintColor: '#E74C3C' }]}
-                                />
-                                <Text style={[styles.menuItemText, { color: '#E74C3C' }]}>Logout</Text>
-                                <Image
-                                    source={{ uri: "https://cdn-icons-png.flaticon.com/512/271/271228.png" }}
-                                    style={[styles.arrowIcon, { tintColor: '#E74C3C' }]}
+                                <HugeiconsIcon icon={LogoutSquare02Icon} color={PRIMARY} />
+                                <Text style={[styles.menuItemText, { color: PRIMARY }]}>Logout</Text>
+                                <HugeiconsIcon
+                                    icon={ArrowRight01Icon}
+                                    color={PRIMARY}
                                 />
                             </TouchableOpacity>
                         </View>
@@ -304,9 +295,6 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderColor: "#eee",
     },
-    navItem: { alignItems: "center" },
-    navIcon: { width: 22, height: 22 },
-    navText: { fontSize: 12, marginTop: 4, color: "gray" },
 
     // Hamburger Menu Styles
     modalOverlay: {
@@ -365,11 +353,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         fontWeight: '500',
-    },
-    arrowIcon: {
-        width: 16,
-        height: 16,
-        tintColor: '#ccc',
+        marginLeft: 5
     },
     menuDivider: {
         height: 1,

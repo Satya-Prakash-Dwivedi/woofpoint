@@ -3,11 +3,12 @@ import Landing from "./src/screens/Landing";
 import Role from "./src/screens/Role";
 import Login from "./src/screens/Login";
 import Signup from "./src/screens/Signup";
-import OwnerHome from "./src/screens/HomeOwner";
+import OwnerHome from "./src/Owner/HomeOwner";
 import UploadPhoto from "./src/screens/UploadPhoto";
 import TrainerHome from "./src/Trainer/TrainerHomeScreen";
 import EditTrainerProfile from "./src/Trainer/EditTrainerProfile";
 import TrainerProfileScreen from "./src/Trainer/TrainerProfile";
+import EditOwnerProfile from "./src/Owner/EditOwnerProfile";
 
 // Navigation
 import { NavigationContainer } from "@react-navigation/native"
@@ -23,6 +24,7 @@ export type RootStackParamList = {
   UploadPhoto: { token: string; role: "owner" | "trainer" };
   EditTrainerProfile: { token: string };
   TrainerProfile: undefined;
+  EditOwnerProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -88,6 +90,13 @@ function app() {
           name="TrainerProfile"
           component={TrainerProfileScreen}
           options={{ headerShown: false }} // hide default header
+        />
+        <Stack.Screen
+          name="EditOwnerProfile"
+          component={EditOwnerProfile}
+          options={{
+            title: ""
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

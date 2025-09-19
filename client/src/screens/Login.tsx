@@ -189,7 +189,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
                 </View>
                 <View style={styles.bottomSection} >
                     <Text style={styles.bottomText}>Don't have an account?</Text>
-                    <Text style={[styles.bottomText, { color: '#e88b5a' }]}>  Sign Up</Text>
+                    <Text onPress={() => navigation.navigate("Signup")} style={[styles.bottomText, { color: '#e88b5a' }]}>  Sign Up</Text>
                 </View>
             </View>
         </View >

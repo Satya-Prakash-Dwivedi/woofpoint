@@ -1,5 +1,6 @@
-import { Image, StyleSheet, Text, View, SafeAreaView, ScrollView, Button, TouchableOpacity } from 'react-native'
+import { Image, StyleSheet, Text, View, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
 import React from 'react'
+import Colors from '../constants/Colors'
 
 // Navigation
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
@@ -9,89 +10,42 @@ type LandingProps = NativeStackScreenProps<RootStackParamList, 'Landing'>
 
 const Landing = ({ navigation }: LandingProps) => {
     return (
-        <SafeAreaView style={{ backgroundColor: '#fff2e6' }}>
-            <ScrollView>
-                <View>
-                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={styles.heading}>Woof Point</Text>
-                        <Text style={styles.subHeading}>Connect with certified dog trainers in your area</Text>
-                        <Image style={styles.Image} source={{
+        <SafeAreaView style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                {/* Header Section */}
+                <View style={styles.headerSection}>
+                    <Text style={styles.heading}>Woof Point</Text>
+                    <Text style={styles.subHeading}>Connect with certified dog trainers
+                        in your area</Text>
+                    <Image
+                        style={styles.heroImage}
+                        source={{
                             uri: "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI1LTA3L3NyLWltYWdlLTE5MDYyNS1iZTAzLXMtNTY3LWJhbm5lci1tY29ldWlkdy5qcGc.jpg"
-                        }} />
-                    </View>
-                    <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={styles.subHeadingtwo}>Why Choose Woof Point?</Text>
-                        <View style={styles.card}>
-                            <View style={styles.cardCircle}>
-                                <Image style={styles.cardImage}
-                                    source={{
-                                        uri: "https://images.rawpixel.com/image_png_social_landscape/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIyLTA0L2pvYjY4NS04OS1wLnBuZw.png"
-                                    }} />
-                            </View>
-                            <Text style={styles.cardHeading}>
-                                Verified Experts
-                            </Text>
-                            <Text style={styles.cardSubHeading}>
-                                Certified professionals with proven track record
-                            </Text>
-                        </View>
-                        <View style={styles.card}>
-                            <View style={styles.cardCircle}>
-                                <Image style={styles.cardImage}
-                                    source={{
-                                        uri: "https://img.freepik.com/free-vector/target-goal-with-arrow-flat-style_78370-8120.jpg"
-                                    }} />
-                            </View>
-                            <Text style={styles.cardHeading}>
-                                Tailored Training
-                            </Text>
-                            <Text style={styles.cardSubHeading}>
-                                Custom programs designed for your dog's unique needs
-                            </Text>
-                        </View>
-                        <View style={styles.card}>
-                            <View style={styles.cardCircle}>
-                                <Image style={styles.cardImage}
-                                    source={{
-                                        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXjlajDWJaboK5yVOvA4Dn3o0N2GhEuz44AQ&s"
-                                    }} />
-                            </View>
-                            <Text style={styles.cardHeading}>
-                                Track Progress
-                            </Text>
-                            <Text style={styles.cardSubHeading}>
-                                Monitor Development and celebrate every milestone
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={styles.Bottom}>
-                        <TouchableOpacity
-                            style={styles.BottomButton}
-                            onPress={() => navigation.navigate("HomeScreen")}
-                        >
-                            <Text style={styles.BottomText}>
-                                Explore Trainers
-                            </Text>
-                        </TouchableOpacity>
+                        }}
+                    />
+                </View>
 
-                        <View style={{ flex: 2, flexDirection: 'row', gap: 10 }}>
-                            <TouchableOpacity
-                                style={styles.BottomAuth}
-                                onPress={() => navigation.navigate("Login")}
-                            >
-                                <Text style={styles.BottomText}>
-                                    Log In
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                style={styles.BottomAuth}
-                                onPress={() => navigation.navigate("Signup")}
-                            >
-                                <Text style={styles.BottomText}>
-                                    Sign Up
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
+                {/* Bottom Section */}
+                <View style={styles.bottomSection}>
+                    <TouchableOpacity
+                        style={styles.primaryButton}
+                    >
+                        <Text onPress={() => navigation.navigate("OwnerHome", { token: "" })} style={styles.buttonText}>Explore Trainers</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.authButtonsContainer}>
+                        <TouchableOpacity
+                            style={styles.authButton}
+                            onPress={() => navigation.navigate("Login")}
+                        >
+                            <Text style={styles.buttonText}>Log In</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.authButton}
+                            onPress={() => navigation.navigate("Signup")}
+                        >
+                            <Text style={styles.buttonText}>Sign Up</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
@@ -102,98 +56,107 @@ const Landing = ({ navigation }: LandingProps) => {
 export default Landing
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff2e6',
+    },
+    scrollContent: {
+        flexGrow: 1,
+        justifyContent: 'space-between',
+        paddingBottom: 20,
+    },
+    headerSection: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+        paddingTop: 40,
+        flex: 1,
+    },
     heading: {
-        fontSize: 35,
+        fontSize: 36,
         fontWeight: '700',
-        margin: 10
+        color: Colors.primary,
+        marginBottom: 10,
+        textAlign: 'center',
     },
     subHeading: {
         fontSize: 18,
-        fontWeight: 400,
-        color: '#6C7A89'
+        fontWeight: '400',
+        color: Colors.secondary,
+        textAlign: 'center',
+        marginBottom: 40,
+        paddingHorizontal: 10,
+        maxWidth: 300
     },
-    Image: {
-        height: 250,
-        width: 350,
+    heroImage: {
+        height: 280,
+        width: '90%',
+        maxWidth: 350,
         borderRadius: 20,
         borderWidth: 4,
         borderColor: '#E97B47',
-        margin: 20
     },
-    subHeadingtwo: {
-        fontWeight: 600,
-        fontSize: 20,
-        marginBottom: 20
-    },
-    card: {
-        width: 330,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'white',
-        shadowColor: 'black',
-        shadowOpacity: 0.25,
-        boxShadow: 'black',
-        borderRadius: 10,
-        padding: 20,
-        margin: 20
-    },
-    cardCircle: {
-        height: 50,
-        width: 50,
-        backgroundColor: '#E97B47',
-        borderRadius: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-        margin: 10,
-    },
-    cardImage: {
-        height: 30,
-        width: 30,
-        borderRadius: 50
-    },
-    cardHeading: {
-        fontSize: 19,
-        fontWeight: 600,
-        margin: 10
-    },
-    cardSubHeading: {
-        fontSize: 16,
-        fontWeight: 500,
-        color: 'grey',
-        textAlign: 'center'
-    },
-    Bottom: {
+    bottomSection: {
         backgroundColor: 'white',
         alignItems: 'center',
-        padding: 20,
-        marginTop: 30,
-        borderTopEndRadius: 20,
-        borderTopStartRadius: 20,
-        shadowColor: 'grey',
-        shadowOpacity: 0.25,
+        paddingHorizontal: 20,
+        paddingVertical: 30,
+        borderTopLeftRadius: 25,
+        borderTopRightRadius: 25,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: -2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+        elevation: 5,
     },
-    BottomButton: {
+    primaryButton: {
         backgroundColor: '#E97B47',
         paddingHorizontal: 10,
-        paddingVertical: 10,
-        width: 300,
+        paddingVertical: 12,
+        width: '50%',
+        maxWidth: 300,
         alignItems: 'center',
-        borderRadius: 10
+        borderRadius: 12,
+        marginBottom: 20,
+        shadowColor: '#E97B47',
+        shadowOffset: {
+            width: 0,
+            height: 3,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
     },
-    BottomText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 600,
-        textAlign: 'center',
+    authButtonsContainer: {
+        flexDirection: 'row',
+        width: '90%',
+        maxWidth: 300,
+        justifyContent: 'space-between',
+        gap: 15,
     },
-    BottomAuth: {
+    authButton: {
         backgroundColor: '#E97B47',
-        width: 145,
-        marginTop: 10,
-        borderRadius: 10,
-        color: 'white',
-        textAlign: 'center',
+        flex: 1,
+        paddingVertical: 10,
+        borderRadius: 12,
+        alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: 7
+        shadowColor: '#E97B47',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3,
+        elevation: 3,
+    },
+    buttonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
     },
 })

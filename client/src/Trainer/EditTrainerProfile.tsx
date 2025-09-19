@@ -14,6 +14,9 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { HugeiconsIcon } from '@hugeicons/react-native';
+import { ArrowLeft02Icon } from "@hugeicons/core-free-icons"
+
 
 interface TrainerProfile {
     firstName: string;
@@ -125,8 +128,7 @@ const EditTrainerProfile: React.FC<Props> = ({ navigation }) => {
                 {/* Header */}
                 <View style={styles.header}>
                     <TouchableOpacity onPress={goBack} style={styles.backButton}>
-                        <Text style={styles.backArrow}>‹</Text>
-                        <Text style={styles.backText}>Back</Text>
+                        <HugeiconsIcon icon={ArrowLeft02Icon} />
                     </TouchableOpacity>
                     <Text style={styles.heading}>Edit Profile</Text>
                     <View style={{ width: 60 }} />

@@ -15,7 +15,6 @@ export interface IDogOwner extends Document {
         size?: 'small' | 'medium' | 'large';
         photos: string[];
     }>;
-    bookingHistory: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -40,10 +39,6 @@ const DogOwnerSchema: Schema<IDogOwner> = new Schema({
         size: { type: String, enum: ['small', 'medium', 'large'], default: 'small' },
         photos: [{ type: String }]
     }],
-    bookingHistory: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Booking'
-    }]
 }, {
     timestamps: true
 });

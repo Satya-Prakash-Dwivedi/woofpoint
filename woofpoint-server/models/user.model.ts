@@ -65,7 +65,6 @@ const UserSchema: Schema<IUser> = new Schema({
 
 // Search Indexes for query
 
-UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 UserSchema.index({ zipCode: 1 });
 
