@@ -117,11 +117,11 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
             {/* Header */}
             <View style={styles.header}>
                 {/* Left Spacer */}
-                <View style={{ width: 28 }} />
+                {/* <View style={{ width: 28 }} /> */}
                 <Text style={styles.headerTitle}>Summary</Text>
 
                 {/* Hamburger Icon */}
-                <TouchableOpacity onPress={toggleMenu}>
+                <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
                     <HugeiconsIcon
                         icon={Menu01Icon}
                         size={30}
@@ -247,11 +247,14 @@ const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#fff" },
     header: {
         flexDirection: "row",
-        justifyContent: "space-between",
+        justifyContent: "center",
         alignItems: "center",
         padding: 16,
     },
-    headerTitle: { fontSize: 18, fontWeight: "600" },
+    headerTitle: { fontSize: 18, fontWeight: "600", position: 'absolute', left: 0, right: 0, textAlign: 'center' },
+    menuButton: {
+        marginLeft: "auto",
+    },
     sectionTitle: { fontSize: 18, fontWeight: "700", marginLeft: 16, marginTop: 8 },
     summaryContainer: {
         flexDirection: "row",
