@@ -9,10 +9,15 @@ import {
     SafeAreaView,
     Image,
     ImageSourcePropType,
+    Modal, Alert
 } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import { HugeiconsIcon } from '@hugeicons/react-native';
-import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon } from '@hugeicons/core-free-icons';
+import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 import Colors from '../constants/Colors';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
 
 const PRIMARY: string = '#E97B47';
 const BG: string = '#FEFBF6';
@@ -44,17 +49,81 @@ interface BottomNavItemProps {
     onPress?: () => void;
 }
 
-const OwnerHome: React.FC = () => {
+type Props = NativeStackScreenProps<RootStackParamList, "OwnerHome">;
+
+const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
+    const { token } = route.params;
     const [searchText, setSearchText] = useState<string>('');
     const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');
     const [selectedDistance, setSelectedDistance] = useState<string>('');
     const [selectedRating, setSelectedRating] = useState<string>('');
+    const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuVisible(!isMenuVisible);
+    }
+
+    const handleEditProfile = () => {
+        setIsMenuVisible(false);
+        navigation.navigate('EditOwnerProfile', { token });
+    };
+
+    const handleLogout = async () => {
+        setIsMenuVisible(false);
+
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            // Call logout API
+                            await axios.post(
+                                'http://localhost:3001/api/auth/logout',
+                                {},
+                                {
+                                    headers: {
+                                        Authorization: `Bearer ${token}`,
+                                        'Content-Type': 'application/json',
+                                    },
+                                }
+                            );
+                        } catch (error) {
+                            console.log('Logout API call failed, but continuing with local logout:', error);
+                            // Continue with logout even if API call fails
+                        }
+
+                        try {
+                            // Remove token from AsyncStorage
+                            await AsyncStorage.removeItem('authToken');
+
+                            // Navigate to login screen and reset stack
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Login' }],
+                            });
+                        } catch (storageError) {
+                            console.error('Error during logout:', storageError);
+                            Alert.alert('Error', 'Failed to logout. Please try again.');
+                        }
+                    },
+                },
+            ]
+        );
+    };
 
     // Dummy trainer data with proper typing
     const trainers: Trainer[] = [
         {
             id: 1,
-            name: 'Sarah Miller',
+            name: 'Steve Jobs',
             rating: 4.8,
             reviews: 123,
             distance: '1.2 miles away',
@@ -62,7 +131,7 @@ const OwnerHome: React.FC = () => {
         },
         {
             id: 2,
-            name: 'Mark Thompson',
+            name: 'Osho',
             rating: 4.5,
             reviews: 210,
             distance: '2.5 miles away',
@@ -77,11 +146,6 @@ const OwnerHome: React.FC = () => {
             specialization: 'Swimming Training',
         },
     ];
-
-    const handleMenuPress = (): void => {
-        console.log('Menu pressed');
-        // Implement menu navigation logic
-    };
 
     const handleSearchSubmit = (): void => {
         console.log('Search submitted:', searchText);
@@ -113,16 +177,7 @@ const OwnerHome: React.FC = () => {
         // Implement bottom navigation logic
     };
 
-    // Navigation icons mapping
-    const getNavIcon = (title: string): string => {
-        const iconMap: { [key: string]: string } = {
-            'Home': 'https://cdn-icons-png.flaticon.com/512/1946/1946488.png',
-            'Bookings': 'https://cdn-icons-png.flaticon.com/512/747/747310.png',
-            'Messages': 'https://cdn-icons-png.flaticon.com/512/134/134718.png',
-            'Profile': 'https://cdn-icons-png.flaticon.com/512/1077/1077114.png',
-        };
-        return iconMap[title] || iconMap['Home'];
-    };
+
 
     const FilterButton: React.FC<FilterButtonProps> = ({ title, value, onPress }) => (
         <TouchableOpacity style={styles.filterButton} onPress={onPress} activeOpacity={0.7}>
@@ -153,37 +208,15 @@ const OwnerHome: React.FC = () => {
         </TouchableOpacity>
     );
 
-    const BottomNavItem: React.FC<BottomNavItemProps> = ({
-        title,
-        isActive = false,
-        onPress
-    }) => (
-        <TouchableOpacity
-            style={styles.navItem}
-            onPress={onPress || (() => handleBottomNavPress(title))}
-            activeOpacity={0.7}
-        >
-            <Image
-                source={{ uri: getNavIcon(title) }}
-                style={[
-                    styles.navIcon,
-                    { tintColor: isActive ? '#333' : '#CCC' }
-                ]}
-            />
-            <Text style={[styles.navText, isActive && styles.activeNavText]}>
-                {title}
-            </Text>
-        </TouchableOpacity>
-    );
-
     return (
         <SafeAreaView style={styles.container}>
 
             {/* Header */}
             <View style={styles.header}>
+
+                <Text style={styles.headerTitle}>Woof Point</Text>
                 <TouchableOpacity
-                    style={styles.menuButton}
-                    onPress={handleMenuPress}
+                    onPress={toggleMenu}
                     activeOpacity={0.7}
                 >
                     <HugeiconsIcon
@@ -192,8 +225,6 @@ const OwnerHome: React.FC = () => {
                         strokeWidth={1.5}
                     />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Home</Text>
-                <View style={styles.headerSpacer} />
             </View>
 
             <ScrollView
@@ -273,6 +304,50 @@ const OwnerHome: React.FC = () => {
                     strokeWidth={1.5}
                     color="black" />
             </View>
+
+            <Modal
+                animationType='fade'
+                transparent={true}
+                visible={isMenuVisible}
+                onRequestClose={() =>
+                    setIsMenuVisible(false)
+                }
+            >
+                <TouchableOpacity
+                    style={styles.modalOverlay}
+                    onPress={() =>
+                        setIsMenuVisible(false)}
+                    activeOpacity={1}
+                >
+                    <View style={styles.menuContainer}>
+                        <View style={styles.menuHeader}>
+                            <Text style={styles.menuTitle}>Menu</Text>
+                            <TouchableOpacity onPress={() => setIsMenuVisible(false)}>
+                                <HugeiconsIcon icon={CancelCircleIcon} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={styles.menuItems}>
+                            <TouchableOpacity style={styles.menuItem} onPress={handleEditProfile}>
+                                <HugeiconsIcon icon={FileEditIcon} />
+                                <Text style={styles.menuItemText}>Edit Profile</Text>
+                                <HugeiconsIcon icon={ArrowRight01Icon} />
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+                                <HugeiconsIcon icon={LogoutSquare02Icon} color={PRIMARY} />
+                                <Text style={[styles.menuItemText, { color: PRIMARY }]}>Logout</Text>
+                                <HugeiconsIcon
+                                    icon={ArrowRight01Icon}
+                                    color={PRIMARY}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </TouchableOpacity>
+
+            </Modal>
+
         </SafeAreaView>
     );
 };
@@ -285,6 +360,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingVertical: 15,
         backgroundColor: BG,
@@ -295,20 +371,10 @@ const styles = StyleSheet.create({
         padding: 5,
         borderRadius: 4,
     },
-    menuIcon: {
-        width: 24,
-        height: 24,
-        tintColor: '#333',
-    },
     headerTitle: {
-        flex: 1,
-        textAlign: 'center',
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#333',
-    },
-    headerSpacer: {
-        width: 30,
+        fontSize: 20,
+        fontWeight: '700',
+        color: PRIMARY,
     },
     content: {
         flex: 1,
@@ -452,25 +518,52 @@ const styles = StyleSheet.create({
         gap: 10,
         justifyContent: 'space-between'
     },
-    navItem: {
+    modalOverlay: {
         flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'flex-start',
+    },
+    menuContainer: {
+        backgroundColor: '#fff',
+        marginTop: 80,
+        marginHorizontal: 20,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    menuHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 5,
-        paddingVertical: 5,
+        padding: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
     },
-    navIcon: {
-        width: 24,
-        height: 24,
-        color: Colors.primary,
+    menuTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#333',
     },
-    navText: {
-        fontSize: 12,
-        color: Colors.black,
-        fontWeight: '400',
+    menuItems: {
+        paddingVertical: 10,
     },
-    activeNavText: {
+    menuItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        borderRadius: 8,
+        marginHorizontal: 10,
+    },
+    menuItemText: {
+        flex: 1,
+        fontSize: 16,
         color: '#333',
         fontWeight: '500',
+        marginLeft: 5
     },
 });
 

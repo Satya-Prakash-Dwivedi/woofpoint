@@ -116,7 +116,6 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                {/* Left Spacer */}
                 {/* <View style={{ width: 28 }} /> */}
                 <Text style={styles.headerTitle}>Summary</Text>
 

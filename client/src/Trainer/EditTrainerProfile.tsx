@@ -27,7 +27,7 @@ interface TrainerProfile {
     bio: string;
     profilePhoto?: string;
     certifications: string[];
-    services: { type: string; description: string; duration: number; price: number }[];
+    services: { type: string; description: string; duration: number | null; price: number | null }[];
     location: { address: string; city: string; state: string };
     specializations: string[];
 }
@@ -221,10 +221,10 @@ const EditTrainerProfile: React.FC<Props> = ({ navigation }) => {
                                 style={styles.input}
                                 placeholder="Duration (mins)"
                                 keyboardType="numeric"
-                                value={service.duration.toString()}
+                                value={service.duration ? service.duration.toString() : ""}
                                 onChangeText={(t) => {
                                     const updated = [...form.services];
-                                    updated[idx].duration = Number(t);
+                                    updated[idx].duration = t ? Number(t) : null;
                                     handleChange("services", updated);
                                 }}
                             />
@@ -232,10 +232,10 @@ const EditTrainerProfile: React.FC<Props> = ({ navigation }) => {
                                 style={styles.input}
                                 placeholder="Price"
                                 keyboardType="numeric"
-                                value={service.price.toString()}
+                                value={service.price ? service.price.toString() : ""}
                                 onChangeText={(t) => {
                                     const updated = [...form.services];
-                                    updated[idx].price = Number(t);
+                                    updated[idx].price = t ? Number(t) : null;
                                     handleChange("services", updated);
                                 }}
                             />

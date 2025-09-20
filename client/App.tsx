@@ -24,7 +24,7 @@ export type RootStackParamList = {
   UploadPhoto: { token: string; role: "owner" | "trainer" };
   EditTrainerProfile: { token: string };
   TrainerProfile: undefined;
-  EditOwnerProfile: undefined;
+  EditOwnerProfile: { token: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
