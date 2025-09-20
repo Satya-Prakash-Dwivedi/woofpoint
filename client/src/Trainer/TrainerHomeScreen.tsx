@@ -116,6 +116,11 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
+                {/* Left Spacer */}
+                <View style={{ width: 28 }} />
+                <Text style={styles.headerTitle}>Summary</Text>
+
+                {/* Hamburger Icon */}
                 <TouchableOpacity onPress={toggleMenu}>
                     <HugeiconsIcon
                         icon={Menu01Icon}
@@ -123,8 +128,6 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                         strokeWidth={1.5}
                     />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Summary</Text>
-                <View style={{ width: 28 }} />
             </View>
 
             {/* Summary */}
@@ -161,7 +164,7 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                 )}
             />
 
-            {/* Bottom Nav with Images */}
+            {/* Bottom Nav */}
             <View style={styles.navBar}>
                 <TouchableOpacity>
                     <HugeiconsIcon
@@ -196,8 +199,9 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
 
             {/* Hamburger Menu Modal */}
             <Modal
-                animationType="slide"
+                animationType="fade"
                 transparent={true}
+                // backdropColor={'black'}
                 visible={isMenuVisible}
                 onRequestClose={() => setIsMenuVisible(false)}
             >
@@ -220,8 +224,6 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                                 <Text style={styles.menuItemText}>Edit Profile</Text>
                                 <HugeiconsIcon icon={ArrowRight01Icon} />
                             </TouchableOpacity>
-
-                            <View style={styles.menuDivider} />
 
                             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                                 <HugeiconsIcon icon={LogoutSquare02Icon} color={PRIMARY} />
@@ -250,7 +252,6 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     headerTitle: { fontSize: 18, fontWeight: "600" },
-    headerIcon: { width: 28, height: 28 },
     sectionTitle: { fontSize: 18, fontWeight: "700", marginLeft: 16, marginTop: 8 },
     summaryContainer: {
         flexDirection: "row",
@@ -326,11 +327,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#333',
     },
-    closeIcon: {
-        width: 24,
-        height: 24,
-        tintColor: '#666',
-    },
     menuItems: {
         paddingVertical: 10,
     },
@@ -342,23 +338,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginHorizontal: 10,
     },
-    menuIcon: {
-        width: 24,
-        height: 24,
-        tintColor: '#666',
-        marginRight: 15,
-    },
     menuItemText: {
         flex: 1,
         fontSize: 16,
         color: '#333',
         fontWeight: '500',
         marginLeft: 5
-    },
-    menuDivider: {
-        height: 1,
-        backgroundColor: '#f0f0f0',
-        marginHorizontal: 20,
-        marginVertical: 10,
     },
 });
