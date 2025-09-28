@@ -1,12 +1,10 @@
-import { Router } from "express";
+import express from "express";
+import { authMiddleware } from "../middleware/auth";
 import { getOwnerProfile, updateOwnerProfile } from "../controllers/owner";
 
-const router = Router();
+const router = express.Router();
 
-// GET owner profile (by userId)
-router.get("/:userId", getOwnerProfile);
-
-// UPDATE owner profile (by userId)
-router.put("/:userId", updateOwnerProfile);
+router.get("/profile", authMiddleware, getOwnerProfile);
+router.put("/profile", authMiddleware, updateOwnerProfile);
 
 export default router;

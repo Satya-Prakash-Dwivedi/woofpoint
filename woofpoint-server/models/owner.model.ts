@@ -13,7 +13,7 @@ export interface IDogOwner extends Document {
         breed?: string;
         age?: number;
         size?: 'small' | 'medium' | 'large';
-        photos: string[];
+        photos?: string[];
     }>;
     createdAt: Date;
     updatedAt: Date;

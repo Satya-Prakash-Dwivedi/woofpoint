@@ -75,6 +75,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
 
             // Store token
             await AsyncStorage.setItem("authToken", token);
+            await AsyncStorage.setItem("authUser", JSON.stringify(user))
 
             // Handle successful login
             Alert.alert(

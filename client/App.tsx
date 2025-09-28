@@ -9,6 +9,7 @@ import TrainerHome from "./src/Trainer/TrainerHomeScreen";
 import EditTrainerProfile from "./src/Trainer/EditTrainerProfile";
 import TrainerProfileScreen from "./src/Trainer/TrainerProfile";
 import EditOwnerProfile from "./src/Owner/EditOwnerProfile";
+import OwnerProfile from "./src/Owner/OwnerProfile";
 
 // Navigation
 import { NavigationContainer } from "@react-navigation/native"
@@ -22,9 +23,10 @@ export type RootStackParamList = {
   OwnerHome: { token: string };
   TrainerHome: { token: string };
   UploadPhoto: { token: string; role: "owner" | "trainer" };
-  EditTrainerProfile: { token: string };
   TrainerProfile: undefined;
+  EditTrainerProfile: { token: string };
   EditOwnerProfile: { token: string };
+  OwnerProfile: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -95,7 +97,16 @@ function app() {
           name="EditOwnerProfile"
           component={EditOwnerProfile}
           options={{
-            title: ""
+            title: "",
+            headerShown: false
+          }}
+        />
+        <Stack.Screen
+          name="OwnerProfile"
+          component={OwnerProfile}
+          options={{
+            title: "",
+            headerShown: false,
           }}
         />
       </Stack.Navigator>

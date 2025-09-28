@@ -59,6 +59,13 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
     const [selectedRating, setSelectedRating] = useState<string>('');
     const [isMenuVisible, setIsMenuVisible] = useState(false);
 
+    const getToken = () => {
+        const token = AsyncStorage.getItem("authToken")
+        console.log("This is the token")
+    }
+
+    getToken()
+
     const toggleMenu = () => {
         setIsMenuVisible(!isMenuVisible);
     }
@@ -298,11 +305,13 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                     size={30}
                     strokeWidth={1.5}
                     color="black" />
-                <HugeiconsIcon
-                    icon={UserCircleIcon}
-                    size={30}
-                    strokeWidth={1.5}
-                    color="black" />
+                <TouchableOpacity onPress={() => navigation.navigate("OwnerProfile")}>
+                    <HugeiconsIcon
+                        icon={UserCircleIcon}
+                        size={30}
+                        strokeWidth={1.5}
+                        color="black" />
+                </TouchableOpacity>
             </View>
 
             <Modal

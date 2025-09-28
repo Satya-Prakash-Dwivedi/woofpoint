@@ -16,7 +16,7 @@ app.use(express.json())
 
 app.use("/api/auth", userRoutes)
 app.use("/api/trainer", trainerRoutes)
-app.use("/owners", ownerRoutes);
+app.use("/api/owner", ownerRoutes);
 
 
 mongoose

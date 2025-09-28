@@ -127,6 +127,7 @@ export const login = async (req: Request, res: Response) => {
             createdAt: user.createdAt,
             updatedAt: user.updatedAt
         };
+        console.log("This is user login token", token);
 
         res.status(200).json({
             user: userResponse,
@@ -134,6 +135,7 @@ export const login = async (req: Request, res: Response) => {
             message: "Login successful",
             role: user.role
         });
+
 
     } catch (error: any) {
         console.error('Login error:', error);
@@ -154,7 +156,7 @@ export const logout = async (req: AuthRequest, res: Response) => {
         const userId = req.user?.id;
         const userEmail = req.user ? await User.findById(userId, 'email') : null;
 
-        console.log(`User logout: ${userEmail?.email || 'Unknown'} at ${new Date().toISOString()}`);
+        // console.log(`User logout: ${userEmail?.email || 'Unknown'} at ${new Date().toISOString()}`);
 
         res.status(200).json({
             message: "Logged out successfully"
