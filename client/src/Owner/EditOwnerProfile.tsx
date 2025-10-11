@@ -10,13 +10,12 @@ import { HugeiconsIcon } from '@hugeicons/react-native';
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 
 interface OwnerProfile {
-    firstName: string;
-    lastName: string;
-    phone: string;
-    profilePhoto?: string;
-    location: { address: string; city: string; state: string; zipCode: string };
-    dogs: any[];
-  }  
+  firstName: string;
+  lastName: string;
+  phone: string;
+  profilePhoto?: string;
+  location: { address: string; city: string; state: string; zipCode: string };
+}
 
 interface Props {
   navigation: any;
@@ -29,7 +28,6 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
     phone: "",
     profilePhoto: "",
     location: { address: "", city: "", state: "", zipCode: "" },
-  dogs: [],
   });
 
   const goBack = () => navigation?.goBack();
@@ -50,11 +48,10 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
 
       setForm({
         firstName: data.firstName || "",
-  lastName: data.lastName || "",
-  phone: data.phone || "",
-  profilePhoto: data.profilePhoto || "",
-  location: data.location || { address: "", city: "", state: "", zipCode: "" },
-  dogs: data.dogs || [],
+        lastName: data.lastName || "",
+        phone: data.phone || "",
+        profilePhoto: data.profilePhoto || "",
+        location: data.location || { address: "", city: "", state: "", zipCode: "" },
       });
     } catch (err: any) {
       console.error("Owner fetch error:", err.response?.data || err.message);
@@ -69,14 +66,14 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
   const handleChange = (field: keyof OwnerProfile, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
-  
+
   const handleLocationChange = (field: keyof OwnerProfile["location"], value: string) => {
     setForm((prev) => ({
       ...prev,
       location: { ...prev.location, [field]: value },
     }));
   };
-  
+
 
   const handleSave = async () => {
     try {
@@ -86,14 +83,12 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
       await axios.put(
         "http://localhost:3001/api/owner/profile",
         {
-            ...form,
-            firstName: form.firstName,
-            lastName: form.lastName,
-            phone: form.phone,
-            profilePhoto: form.profilePhoto,
-            location: form.location,
-            dogs: form.dogs,
-          },
+          firstName: form.firstName,
+          lastName: form.lastName,
+          phone: form.phone,
+          profilePhoto: form.profilePhoto,
+          location: form.location,
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -134,109 +129,80 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
           </View>
 
           {/* User fields */}
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>First Name</Text>
-  <TextInput
-    style={styles.input}
-    value={form.firstName}
-    onChangeText={(text) => handleChange("firstName", text)}
-    placeholder="Enter First Name"
-  />
-</View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>First Name</Text>
+            <TextInput
+              style={styles.input}
+              value={form.firstName}
+              onChangeText={(text) => handleChange("firstName", text)}
+              placeholder="Enter First Name"
+            />
+          </View>
 
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>Last Name</Text>
-  <TextInput
-    style={styles.input}
-    value={form.lastName}
-    onChangeText={(text) => handleChange("lastName", text)}
-    placeholder="Enter Last Name"
-  />
-</View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.input}
+              value={form.lastName}
+              onChangeText={(text) => handleChange("lastName", text)}
+              placeholder="Enter Last Name"
+            />
+          </View>
 
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>Phone</Text>
-  <TextInput
-    style={styles.input}
-    value={form.phone}
-    onChangeText={(text) => handleChange("phone", text)}
-    placeholder="Enter Phone"
-    keyboardType="phone-pad"
-  />
-</View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Phone</Text>
+            <TextInput
+              style={styles.input}
+              value={form.phone}
+              onChangeText={(text) => handleChange("phone", text)}
+              placeholder="Enter Phone"
+              keyboardType="phone-pad"
+            />
+          </View>
 
-{/* Location fields */}
-<Text style={styles.sectionHeading}>Location</Text>
+          {/* Location fields */}
+          <Text style={styles.sectionHeading}>Location</Text>
 
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>Address</Text>
-  <TextInput
-    style={styles.input}
-    value={form.location.address}
-    onChangeText={(text) => handleLocationChange("address", text)}
-    placeholder="Enter Address"
-  />
-</View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Address</Text>
+            <TextInput
+              style={styles.input}
+              value={form.location.address}
+              onChangeText={(text) => handleLocationChange("address", text)}
+              placeholder="Enter Address"
+            />
+          </View>
 
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>City</Text>
-  <TextInput
-    style={styles.input}
-    value={form.location.city}
-    onChangeText={(text) => handleLocationChange("city", text)}
-    placeholder="Enter City"
-  />
-</View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>City</Text>
+            <TextInput
+              style={styles.input}
+              value={form.location.city}
+              onChangeText={(text) => handleLocationChange("city", text)}
+              placeholder="Enter City"
+            />
+          </View>
 
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>State</Text>
-  <TextInput
-    style={styles.input}
-    value={form.location.state}
-    onChangeText={(text) => handleLocationChange("state", text)}
-    placeholder="Enter State"
-  />
-</View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>State</Text>
+            <TextInput
+              style={styles.input}
+              value={form.location.state}
+              onChangeText={(text) => handleLocationChange("state", text)}
+              placeholder="Enter State"
+            />
+          </View>
 
-<View style={styles.inputGroup}>
-  <Text style={styles.label}>ZIP Code</Text>
-  <TextInput
-    style={styles.input}
-    value={form.location.zipCode}
-    onChangeText={(text) => handleLocationChange("zipCode", text)}
-    placeholder="Enter ZIP Code"
-    keyboardType="number-pad"
-  />
-</View>
-
-{/* Dogs section */}
-<Text style={styles.sectionHeading}>Dogs</Text>
-{form.dogs.length > 0 ? (
-  form.dogs.map((dog, index) => (
-    <View key={index} style={styles.inputGroup}>
-      <Text style={styles.label}>Dog {index + 1}</Text>
-      <TextInput
-        style={styles.input}
-        value={dog.name}
-        placeholder="Dog Name"
-        onChangeText={(text) => {
-          const updatedDogs = [...form.dogs];
-          updatedDogs[index].name = text;
-          setForm((prev) => ({ ...prev, dogs: updatedDogs }));
-        }}
-      />
-    </View>
-  ))
-) : (
-  <Text style={{ color: "#888" }}>No dogs added yet</Text>
-)}
-
-<TouchableOpacity
-  style={styles.addDogButton}
-  onPress={() => setForm((prev) => ({ ...prev, dogs: [...prev.dogs, { name: "" }] }))}
->
-  <Text style={{ color: "#fff" }}>+ Add Dog</Text>
-</TouchableOpacity>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>ZIP Code</Text>
+            <TextInput
+              style={styles.input}
+              value={form.location.zipCode}
+              onChangeText={(text) => handleLocationChange("zipCode", text)}
+              placeholder="Enter ZIP Code"
+              keyboardType="number-pad"
+            />
+          </View>
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
             <Text style={styles.saveButtonText}>Save Changes</Text>
@@ -266,7 +232,8 @@ const styles = StyleSheet.create({
   formContainer: { flex: 1, paddingHorizontal: 20 },
   scrollContent: { paddingVertical: 20 },
   photoContainer: { alignItems: "center", marginBottom: 20 },
-  profilePhoto: {width: 120,
+  profilePhoto: {
+    width: 120,
     height: 120,
     borderRadius: 60,
     marginBottom: 12,
@@ -275,7 +242,8 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOpacity: 0.15,
     shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6, },
+    shadowRadius: 6,
+  },
   placeholder: { justifyContent: "center", alignItems: "center", backgroundColor: "#ddd" },
   placeholderText: { fontSize: 36, fontWeight: "600", color: "#e26110ff" },
   photoLabel: { marginTop: 10, fontSize: 14, color: "#333" },
@@ -306,14 +274,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333",
   },
-  addDogButton: {
-    backgroundColor: "#555",
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  
 });
 
 export default EditOwnerProfile;

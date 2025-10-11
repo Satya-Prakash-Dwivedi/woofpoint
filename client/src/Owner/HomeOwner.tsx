@@ -14,7 +14,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { HugeiconsIcon } from '@hugeicons/react-native';
-import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon, AddCircleIcon } from '@hugeicons/core-free-icons';
 import Colors from '../constants/Colors';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
@@ -68,6 +68,11 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
 
     const toggleMenu = () => {
         setIsMenuVisible(!isMenuVisible);
+    }
+
+    const handlePetProfile = () => {
+        setIsMenuVisible(false);
+        navigation.navigate('AddPet', { token })
     }
 
     const handleEditProfile = () => {
@@ -343,6 +348,12 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                                 <HugeiconsIcon icon={ArrowRight01Icon} />
                             </TouchableOpacity>
 
+                            <TouchableOpacity style={styles.menuItem} onPress={handlePetProfile}>
+                                <HugeiconsIcon icon={AddCircleIcon} />
+                                <Text style={styles.menuItemText}>Add Your Pet</Text>
+                                <HugeiconsIcon icon={ArrowRight01Icon} />
+                            </TouchableOpacity>
+
                             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
                                 <HugeiconsIcon icon={LogoutSquare02Icon} color={PRIMARY} />
                                 <Text style={[styles.menuItemText, { color: PRIMARY }]}>Logout</Text>
@@ -382,8 +393,9 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: '700',
-        color: PRIMARY,
+        // fontWeight: '700',
+        // color: PRIMARY,
+        // fontFamily: "SF-Pro-Rounded-Bold"
     },
     content: {
         flex: 1,

@@ -1,10 +1,17 @@
 import express from "express";
 import { authMiddleware } from "../middleware/auth";
 import { getOwnerProfile, updateOwnerProfile } from "../controllers/owner";
+import { addDog, updateDog, deleteDog } from "../controllers/Pet";
 
 const router = express.Router();
 
+// Owner Profile
 router.get("/profile", authMiddleware, getOwnerProfile);
 router.put("/profile", authMiddleware, updateOwnerProfile);
+
+// Pet Router
+router.post("/dogs", authMiddleware, addDog);
+router.put("/dogs/:dogId", authMiddleware, updateDog);
+router.delete("/dogs/:dogId", authMiddleware, deleteDog)
 
 export default router;

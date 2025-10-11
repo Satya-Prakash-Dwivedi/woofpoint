@@ -10,6 +10,7 @@ import EditTrainerProfile from "./src/Trainer/EditTrainerProfile";
 import TrainerProfileScreen from "./src/Trainer/TrainerProfile";
 import EditOwnerProfile from "./src/Owner/EditOwnerProfile";
 import OwnerProfile from "./src/Owner/OwnerProfile";
+import AddPet from "./src/Owner/AddPet";
 
 // Navigation
 import { NavigationContainer } from "@react-navigation/native"
@@ -26,6 +27,7 @@ export type RootStackParamList = {
   TrainerProfile: undefined;
   EditTrainerProfile: { token: string };
   EditOwnerProfile: { token: string };
+  AddPet: { token: string };
   OwnerProfile: undefined;
 };
 
@@ -104,6 +106,14 @@ function app() {
         <Stack.Screen
           name="OwnerProfile"
           component={OwnerProfile}
+          options={{
+            title: "",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="AddPet"
+          component={AddPet}
           options={{
             title: "",
             headerShown: false,
