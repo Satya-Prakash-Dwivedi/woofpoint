@@ -180,13 +180,13 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                         strokeWidth={1.5}
                         color="black" />
                 </TouchableOpacity>
-                <TouchableOpacity>
+                {/* <TouchableOpacity>
                     <HugeiconsIcon
                         icon={BubbleChatIcon}
                         size={30}
                         strokeWidth={1.5}
                         color="black" />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
                 <TouchableOpacity onPress={() => navigation.navigate("TrainerProfile")}>
                     <HugeiconsIcon
                         icon={UserCircleIcon}

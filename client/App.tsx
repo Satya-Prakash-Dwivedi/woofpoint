@@ -1,6 +1,5 @@
 import { SafeAreaView, Text, View } from "react-native";
 import Landing from "./src/screens/Landing";
-import Role from "./src/screens/Role";
 import Login from "./src/screens/Login";
 import Signup from "./src/screens/Signup";
 import OwnerHome from "./src/Owner/HomeOwner";

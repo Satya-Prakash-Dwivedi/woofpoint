@@ -1,5 +1,6 @@
 import Owner from "../models/owner.model";
 import User from "../models/user.model";
+import Trainer from "../models/trainer.model";
 import s3 from "../utils/s3";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -129,3 +130,47 @@ export const updateOwnerProfile = async (req: any, res: any) => {
     res.status(500).json({ error: "Server error" });
   }
 };    
+
+/* Get all the trainer's profile to show to owners 
+*/
+export const getAllTrainers = async (req: any, res: any) => {
+    try {
+        // 1. Find all users who are trainers
+        const trainerUsers = await User.find({ role: 'trainer' }).select('-password').lean();
+
+        // 2. Get the userIds of these trainers
+        const trainerUserIds = trainerUsers.map(user => user._id);
+
+        // 3. Find all trainer profiles that match the userIds
+        const trainerProfiles = await Trainer.find({ userId: { $in: trainerUserIds } }).lean();
+
+        // 4. Create a map for easy lookup of trainer profiles
+        const trainerProfileMap = new Map();
+        trainerProfiles.forEach(profile => {
+            trainerProfileMap.set(profile.userId.toString(), profile);
+        });
+
+        // 5. Combine user data with trainer profile data
+        const trainers = trainerUsers.map(user => {
+            const profile = trainerProfileMap.get(user._id.toString());
+            return {
+                _id: user._id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                profilePhoto: user.profilePhoto || '', // Provide a default
+                // Add any other relevant fields from the trainer's profile
+                specializations: profile?.portfolio?.specializations || [],
+                averageRating: profile?.ratings?.averageRating || 0,
+                totalReviews: profile?.ratings?.totalReviews || 0,
+                location: profile?.location || { city: "", state: "" },
+            };
+        });
+        
+        // 6. Respond with the combined list of trainers
+        res.status(200).json(trainers);
+
+    } catch (error) {
+        console.error("Error fetching trainers:", error);
+        res.status(500).json({ error: "Server error while fetching trainers" });
+    }
+};

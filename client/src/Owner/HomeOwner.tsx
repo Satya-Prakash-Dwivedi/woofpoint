@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -8,7 +8,7 @@ import {
     StyleSheet,
     SafeAreaView,
     Image,
-    ImageSourcePropType,
+    ActivityIndicator,
     Modal, Alert
 } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -24,20 +24,24 @@ const BG: string = '#FEFBF6';
 
 // Type definitions
 interface Trainer {
-    id: number;
-    name: string;
-    rating: number;
-    reviews: number;
-    distance: string;
-    image?: ImageSourcePropType;
-    specialization: string;
+    _id: string; // Use _id from MongoDB
+    firstName: string;
+    lastName: string;
+    averageRating: number;
+    totalReviews: number;
+    location: {
+        city: string;
+        state: string;
+    };
+    profilePhoto?: string;
+    specializations: string[];
 }
 
-interface FilterButtonProps {
-    title: string;
-    value?: string;
-    onPress: () => void;
-}
+// interface FilterButtonProps {
+//     title: string;
+//     value?: string;
+//     onPress: () => void;
+// }
 
 interface TrainerCardProps {
     trainer: Trainer;
@@ -54,10 +58,51 @@ type Props = NativeStackScreenProps<RootStackParamList, "OwnerHome">;
 const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
     const { token } = route.params;
     const [searchText, setSearchText] = useState<string>('');
-    const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');
-    const [selectedDistance, setSelectedDistance] = useState<string>('');
-    const [selectedRating, setSelectedRating] = useState<string>('');
+    // const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');
+    // const [selectedDistance, setSelectedDistance] = useState<string>('');
+    // const [selectedRating, setSelectedRating] = useState<string>('');
     const [isMenuVisible, setIsMenuVisible] = useState(false);
+
+    const [trainers, setTrainers] = useState<Trainer[]>([]);
+    const [isLoading, setIsLoading] = useState<boolean>(true); // For loading indicator
+    const [error, setError] = useState<string | null>(null);   // For error handling
+
+    useEffect(() => {
+        const fetchTrainers = async () => {
+            try {
+                // Ensure we have a token before making the request
+                const authToken = await AsyncStorage.getItem("authToken");
+                if (!authToken) {
+                    throw new Error("Authentication token not found.");
+                }
+
+                // Make API call to the new endpoint
+                const response = await axios.get('http://localhost:3001/api/owner/trainers', {
+                    headers: {
+                        Authorization: `Bearer ${authToken}`,
+                    },
+                });
+
+                setTrainers(response.data); // Set the fetched trainers to state
+                setError(null); // Clear any previous errors
+
+            } catch (err: any) {
+                console.error("Failed to fetch trainers:", err);
+                setError("Failed to load trainers. Please try again later.");
+                if (err.response?.status === 401) {
+                    // Handle unauthorized access, e.g., navigate to login
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Login' }],
+                    });
+                }
+            } finally {
+                setIsLoading(false); // Stop loading indicator
+            }
+        };
+
+        fetchTrainers();
+    }, []); // Empty dependency array means this runs once when the component mounts
 
     const getToken = () => {
         const token = AsyncStorage.getItem("authToken")
@@ -132,90 +177,96 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
     };
 
     // Dummy trainer data with proper typing
-    const trainers: Trainer[] = [
-        {
-            id: 1,
-            name: 'Steve Jobs',
-            rating: 4.8,
-            reviews: 123,
-            distance: '1.2 miles away',
-            specialization: 'Obedience Training',
-        },
-        {
-            id: 2,
-            name: 'Osho',
-            rating: 4.5,
-            reviews: 210,
-            distance: '2.5 miles away',
-            specialization: 'Behavioral Training',
-        },
-        {
-            id: 3,
-            name: 'Thomas Shelby',
-            rating: 4.9,
-            reviews: 300,
-            distance: '3 miles away',
-            specialization: 'Swimming Training',
-        },
-    ];
+    // const trainers: Trainer[] = [
+    //     {
+    //         id: 1,
+    //         name: 'Steve Jobs',
+    //         rating: 4.8,
+    //         reviews: 123,
+    //         distance: '1.2 miles away',
+    //         specialization: 'Obedience Training',
+    //     },
+    //     {
+    //         id: 2,
+    //         name: 'Osho',
+    //         rating: 4.5,
+    //         reviews: 210,
+    //         distance: '2.5 miles away',
+    //         specialization: 'Behavioral Training',
+    //     },
+    //     {
+    //         id: 3,
+    //         name: 'Thomas Shelby',
+    //         rating: 4.9,
+    //         reviews: 300,
+    //         distance: '3 miles away',
+    //         specialization: 'Swimming Training',
+    //     },
+    // ];
 
     const handleSearchSubmit = (): void => {
         console.log('Search submitted:', searchText);
         // Implement search logic
     };
 
-    const handleSpecializationFilter = (): void => {
-        console.log('Specialization filter pressed');
-        // Implement specialization filter logic
-    };
-
-    const handleDistanceFilter = (): void => {
-        console.log('Distance filter pressed');
-        // Implement distance filter logic
-    };
-
-    const handleRatingFilter = (): void => {
-        console.log('Rating filter pressed');
-        // Implement rating filter logic
-    };
-
-    const handleTrainerPress = (trainerId: number): void => {
+    
+     const handleTrainerPress = (trainerId: string) => {
         console.log('Trainer pressed:', trainerId);
-        // Implement navigation to trainer details
-    };
-
-    const handleBottomNavPress = (tab: string): void => {
-        console.log('Bottom nav pressed:', tab);
-        // Implement bottom navigation logic
+        // Implement navigation to trainer details screen here
     };
 
 
+    // START: RENDER LOGIC WITH LOADING AND ERROR STATES
+    const renderContent = () => {
+        if (isLoading) {
+            return <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 50 }} />;
+        }
 
-    const FilterButton: React.FC<FilterButtonProps> = ({ title, value, onPress }) => (
-        <TouchableOpacity style={styles.filterButton} onPress={onPress} activeOpacity={0.7}>
-            <Text style={styles.filterText}>{title}</Text>
-            <Text style={styles.dropdownIcon}>▼</Text>
-        </TouchableOpacity>
-    );
+        if (error) {
+            return (
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyStateText}>{error}</Text>
+                </View>
+            );
+        }
+
+        if (trainers.length === 0) {
+            return (
+                <View style={styles.emptyState}>
+                    <Text style={styles.emptyStateText}>No trainers found in your area</Text>
+                </View>
+            );
+        }
+
+        return trainers.map((trainer) => (
+            // 3. FIXED: Key is now trainer._id
+              <TrainerCard key={trainer._id} trainer={trainer} />
+        ));
+    };
+    // END: RENDER LOGIC
 
     const TrainerCard: React.FC<TrainerCardProps> = ({ trainer }) => (
         <TouchableOpacity
             style={styles.trainerCard}
-            onPress={() => handleTrainerPress(trainer.id)}
+             onPress={() => handleTrainerPress(trainer._id)}
             activeOpacity={0.7}
         >
             <View style={styles.trainerInfo}>
-                <Text style={styles.distance}>{trainer.distance}</Text>
-                <Text style={styles.trainerName}>{trainer.name}</Text>
+                <Text style={styles.distance}>{`${trainer.location.city}, ${trainer.location.state}`}</Text>
+                <Text style={styles.trainerName}>{`${trainer.firstName} ${trainer.lastName}`}</Text>
                 <Text style={styles.rating}>
-                    {trainer.rating.toFixed(1)} · {trainer.reviews} reviews
+                    {trainer.averageRating.toFixed(1)} · {trainer.totalReviews} reviews
                 </Text>
             </View>
             <View style={styles.trainerImageContainer}>
-                <View style={styles.trainerImagePlaceholder}>
-                    <View style={styles.personIcon} />
-                    <View style={styles.dogIcon} />
-                </View>
+                {trainer.profilePhoto ? (
+                     <Image source={{ uri: trainer.profilePhoto }} style={styles.trainerImage} />
+                ) : (
+                    <View style={styles.trainerImagePlaceholder}>
+                        <View style={styles.personIcon} />
+                        <View style={styles.dogIcon} />
+                    </View>
+                )}
             </View>
         </TouchableOpacity>
     );
@@ -260,8 +311,8 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                 </View>
 
                 {/* Filter Buttons */}
-                <View style={styles.filtersContainer}>
-                    <FilterButton
+                {/* <View style={styles.filtersContainer}> */}
+                    {/* <FilterButton
                         title="Training"
                         value={selectedSpecialization}
                         onPress={handleSpecializationFilter}
@@ -276,13 +327,13 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                         value={selectedRating}
                         onPress={handleRatingFilter}
                     />
-                </View>
+                </View> */}
 
                 {/* Trainers List */}
                 <View style={styles.trainersContainer}>
                     {trainers.length > 0 ? (
                         trainers.map((trainer: Trainer) => (
-                            <TrainerCard key={trainer.id} trainer={trainer} />
+                            <TrainerCard key={trainer._id} trainer={trainer} />
                         ))
                     ) : (
                         <View style={styles.emptyState}>
@@ -305,11 +356,11 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                     size={30}
                     strokeWidth={1.5}
                     color="black" />
-                <HugeiconsIcon
+                {/* <HugeiconsIcon
                     icon={BubbleChatIcon}
                     size={30}
                     strokeWidth={1.5}
-                    color="black" />
+                    color="black" /> */}
                 <TouchableOpacity onPress={() => navigation.navigate("OwnerProfile")}>
                     <HugeiconsIcon
                         icon={UserCircleIcon}
@@ -393,9 +444,9 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        // fontWeight: '700',
-        // color: PRIMARY,
-        // fontFamily: "SF-Pro-Rounded-Bold"
+        fontWeight: '700',
+        color: PRIMARY,
+        fontFamily: "SF-Pro-Rounded-Bold"
     },
     content: {
         flex: 1,
@@ -491,6 +542,11 @@ const styles = StyleSheet.create({
         height: 80,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    trainerImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 10,
     },
     trainerImagePlaceholder: {
         width: 70,
