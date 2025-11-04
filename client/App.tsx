@@ -10,6 +10,7 @@ import TrainerProfileScreen from "./src/Trainer/TrainerProfile";
 import EditOwnerProfile from "./src/Owner/EditOwnerProfile";
 import OwnerProfile from "./src/Owner/OwnerProfile";
 import AddPet from "./src/Owner/AddPet";
+import TrainerDetail from "./src/Owner/TrainerDetail";
 
 // Navigation
 import { NavigationContainer } from "@react-navigation/native"
@@ -28,6 +29,7 @@ export type RootStackParamList = {
   EditOwnerProfile: { token: string };
   AddPet: { token: string };
   OwnerProfile: undefined;
+  TrainerDetail: {trainerId: string}
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -40,7 +42,8 @@ function app() {
           name="Landing"
           component={Landing}
           options={{
-            title: ""
+            title: "",
+            headerShown: false
           }}
         />
 
@@ -48,7 +51,8 @@ function app() {
           name="Login"
           component={Login}
           options={{
-            title: ""
+            title: "",
+            headerShown: false
           }}
         />
 
@@ -56,7 +60,8 @@ function app() {
           name="Signup"
           component={Signup}
           options={{
-            title: ""
+            title: "",
+            headerShown: false
           }}
         />
 
@@ -117,6 +122,14 @@ function app() {
             title: "",
             headerShown: false,
           }}
+        />
+        <Stack.Screen 
+        name="TrainerDetail" 
+        component={TrainerDetail} 
+        options={{
+          title: "",
+          headerShown: false,
+        }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -4,6 +4,7 @@ import Trainer from "../models/trainer.model";
 import s3 from "../utils/s3";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import mongoose from "mongoose";
 
 /**
  * GET /owner/profile
@@ -174,3 +175,70 @@ export const getAllTrainers = async (req: any, res: any) => {
         res.status(500).json({ error: "Server error while fetching trainers" });
     }
 };
+
+/**
+ * GET /owner/trainers/:trainerId
+ * Fetches the complete profile for a single dog trainer.
+ */
+export const getTrainerById = async (req: any, res: any) => {
+    try {
+        const { trainerId } = req.params;
+        console.log(`[Backend Debug] --- Received request for trainerId: ${trainerId}`);
+
+        if (!mongoose.Types.ObjectId.isValid(trainerId)) {
+            console.error(`[Backend Debug] --- Invalid Trainer ID format: ${trainerId}`);
+            return res.status(400).json({ error: "Invalid Trainer ID" });
+        }
+
+        // 1. Find the user document
+        console.log(`[Backend Debug] --- Searching for User with _id: ${trainerId}`);
+        const user = await User.findById(trainerId).select('-password').lean();
+        
+        if (!user) {
+            console.error(`[Backend Debug] --- User not found with _id: ${trainerId}`);
+            return res.status(404).json({ error: "User record not found for this trainer." });
+        }
+
+        if (user.role !== 'trainer') {
+            console.error(`[Backend Debug] --- User found, but their role is '${user.role}', not 'trainer'.`);
+            return res.status(404).json({ error: "This user is not a trainer." });
+        }
+
+        console.log(`[Backend Debug] --- User found: ${user.firstName} ${user.lastName}. Now searching for their Trainer Profile.`);
+
+        // 2. Find the corresponding trainer profile document
+        const trainer = await Trainer.findOne({ userId: user._id }).lean();
+        if (!trainer) {
+            console.error(`[Backend Debug] --- CRITICAL: User record exists, but no Trainer profile was found for userId: ${user._id}`);
+            return res.status(404).json({ error: "Trainer profile not found. The user may not have completed their profile setup." });
+        }
+        
+        console.log(`[Backend Debug] --- Successfully found Trainer profile. Combining data...`);
+
+        // 3. Combine all information into a single profile object
+        const trainerProfile = {
+            _id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            profilePhoto: user.profilePhoto,
+            email: user.email,
+            phone: user.phone,
+            location: trainer.location,
+            bio: trainer.portfolio?.bio,
+            yearsOfExperience: trainer.businessInfo?.yearsOfExperience,
+            certifications: trainer.businessInfo?.certifications,
+            services: trainer.services,
+            specializations: trainer.portfolio?.specializations,
+            averageRating: trainer.ratings?.averageRating,
+            totalReviews: trainer.ratings?.totalReviews,
+        };
+
+        console.log(`[Backend Debug] --- Sending combined profile to frontend.`);
+        res.status(200).json(trainerProfile);
+
+    } catch (error) {
+        console.error("[Backend Debug] --- An unexpected error occurred in getTrainerById:", error);
+        res.status(500).json({ error: "Server error while fetching trainer details" });
+    }
+};
+

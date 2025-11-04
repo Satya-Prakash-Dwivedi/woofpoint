@@ -9,22 +9,28 @@ import {
     SafeAreaView,
     Image,
     ActivityIndicator,
-    Modal, Alert
+    Modal,
+    Alert,
+    Platform 
 } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { HugeiconsIcon } from '@hugeicons/react-native';
-import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon, AddCircleIcon } from '@hugeicons/core-free-icons';
-import Colors from '../constants/Colors';
+import { Menu01Icon, Home09Icon, Calendar02Icon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon, AddCircleIcon, Search01Icon, StarIcon } from '@hugeicons/core-free-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 
-const PRIMARY: string = '#E97B47';
-const BG: string = '#FEFBF6';
+// Design System Colors & Constants
+const PRIMARY = '#E97B47';
+const BG = '#FEFBF6';
+const TEXT_PRIMARY = '#333';
+const TEXT_SECONDARY = '#666';
+const BORDER_COLOR = '#F0F0F0';
+const WHITE = '#FFFFFF';
 
 // Type definitions
 interface Trainer {
-    _id: string; // Use _id from MongoDB
+    _id: string;
     firstName: string;
     lastName: string;
     averageRating: number;
@@ -37,20 +43,9 @@ interface Trainer {
     specializations: string[];
 }
 
-// interface FilterButtonProps {
-//     title: string;
-//     value?: string;
-//     onPress: () => void;
-// }
-
 interface TrainerCardProps {
     trainer: Trainer;
-}
-
-interface BottomNavItemProps {
-    title: string;
-    isActive?: boolean;
-    onPress?: () => void;
+    onPress: () => void;
 }
 
 type Props = NativeStackScreenProps<RootStackParamList, "OwnerHome">;
@@ -58,590 +53,307 @@ type Props = NativeStackScreenProps<RootStackParamList, "OwnerHome">;
 const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
     const { token } = route.params;
     const [searchText, setSearchText] = useState<string>('');
-    // const [selectedSpecialization, setSelectedSpecialization] = useState<string>('');
-    // const [selectedDistance, setSelectedDistance] = useState<string>('');
-    // const [selectedRating, setSelectedRating] = useState<string>('');
     const [isMenuVisible, setIsMenuVisible] = useState(false);
-
     const [trainers, setTrainers] = useState<Trainer[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true); // For loading indicator
-    const [error, setError] = useState<string | null>(null);   // For error handling
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchTrainers = async () => {
             try {
-                // Ensure we have a token before making the request
                 const authToken = await AsyncStorage.getItem("authToken");
                 if (!authToken) {
                     throw new Error("Authentication token not found.");
                 }
 
-                // Make API call to the new endpoint
                 const response = await axios.get('http://localhost:3001/api/owner/trainers', {
-                    headers: {
-                        Authorization: `Bearer ${authToken}`,
-                    },
+                    headers: { Authorization: `Bearer ${authToken}` },
                 });
-
-                setTrainers(response.data); // Set the fetched trainers to state
-                setError(null); // Clear any previous errors
-
+                setTrainers(response.data);
+                setError(null);
             } catch (err: any) {
                 console.error("Failed to fetch trainers:", err);
                 setError("Failed to load trainers. Please try again later.");
                 if (err.response?.status === 401) {
-                    // Handle unauthorized access, e.g., navigate to login
-                    navigation.reset({
-                        index: 0,
-                        routes: [{ name: 'Login' }],
-                    });
+                    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
                 }
             } finally {
-                setIsLoading(false); // Stop loading indicator
+                setIsLoading(false);
             }
         };
-
         fetchTrainers();
-    }, []); // Empty dependency array means this runs once when the component mounts
+    }, []);
 
-    const getToken = () => {
-        const token = AsyncStorage.getItem("authToken")
-        console.log("This is the token")
-    }
-
-    getToken()
-
-    const toggleMenu = () => {
-        setIsMenuVisible(!isMenuVisible);
-    }
-
+    const toggleMenu = () => setIsMenuVisible(!isMenuVisible);
     const handlePetProfile = () => {
         setIsMenuVisible(false);
-        navigation.navigate('AddPet', { token })
-    }
-
+        navigation.navigate('AddPet', { token });
+    };
     const handleEditProfile = () => {
         setIsMenuVisible(false);
         navigation.navigate('EditOwnerProfile', { token });
     };
+    const handleTrainerPress = (trainerId: string) => {
+        navigation.navigate('TrainerDetail', { trainerId });
+    };
 
-    const handleLogout = async () => {
+    const handleLogout = () => {
         setIsMenuVisible(false);
-
-        Alert.alert(
-            'Logout',
-            'Are you sure you want to logout?',
-            [
-                {
-                    text: 'Cancel',
-                    style: 'cancel',
+        Alert.alert('Logout', 'Are you sure you want to logout?', [
+            { text: 'Cancel', style: 'cancel' },
+            {
+                text: 'Logout',
+                style: 'destructive',
+                onPress: async () => {
+                    try {
+                        await axios.post('http://localhost:3001/api/auth/logout', {}, {
+                            headers: { Authorization: `Bearer ${token}` },
+                        });
+                    } catch (error) {
+                        console.log('Logout API call failed, continuing local logout.');
+                    }
+                    await AsyncStorage.removeItem('authToken');
+                    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
                 },
-                {
-                    text: 'Logout',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            // Call logout API
-                            await axios.post(
-                                'http://localhost:3001/api/auth/logout',
-                                {},
-                                {
-                                    headers: {
-                                        Authorization: `Bearer ${token}`,
-                                        'Content-Type': 'application/json',
-                                    },
-                                }
-                            );
-                        } catch (error) {
-                            console.log('Logout API call failed, but continuing with local logout:', error);
-                            // Continue with logout even if API call fails
-                        }
-
-                        try {
-                            // Remove token from AsyncStorage
-                            await AsyncStorage.removeItem('authToken');
-
-                            // Navigate to login screen and reset stack
-                            navigation.reset({
-                                index: 0,
-                                routes: [{ name: 'Login' }],
-                            });
-                        } catch (storageError) {
-                            console.error('Error during logout:', storageError);
-                            Alert.alert('Error', 'Failed to logout. Please try again.');
-                        }
-                    },
-                },
-            ]
-        );
+            },
+        ]);
     };
 
-    // Dummy trainer data with proper typing
-    // const trainers: Trainer[] = [
-    //     {
-    //         id: 1,
-    //         name: 'Steve Jobs',
-    //         rating: 4.8,
-    //         reviews: 123,
-    //         distance: '1.2 miles away',
-    //         specialization: 'Obedience Training',
-    //     },
-    //     {
-    //         id: 2,
-    //         name: 'Osho',
-    //         rating: 4.5,
-    //         reviews: 210,
-    //         distance: '2.5 miles away',
-    //         specialization: 'Behavioral Training',
-    //     },
-    //     {
-    //         id: 3,
-    //         name: 'Thomas Shelby',
-    //         rating: 4.9,
-    //         reviews: 300,
-    //         distance: '3 miles away',
-    //         specialization: 'Swimming Training',
-    //     },
-    // ];
-
-    const handleSearchSubmit = (): void => {
-        console.log('Search submitted:', searchText);
-        // Implement search logic
-    };
-
-    
-     const handleTrainerPress = (trainerId: string) => {
-        console.log('Trainer pressed:', trainerId);
-        // Implement navigation to trainer details screen here
-    };
-
-
-    // START: RENDER LOGIC WITH LOADING AND ERROR STATES
     const renderContent = () => {
         if (isLoading) {
-            return <ActivityIndicator size="large" color={PRIMARY} style={{ marginTop: 50 }} />;
+            return <ActivityIndicator size="large" color={PRIMARY} style={styles.loader} />;
         }
-
         if (error) {
-            return (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyStateText}>{error}</Text>
-                </View>
-            );
+            return <View style={styles.emptyStateContainer}><Text style={styles.emptyStateText}>{error}</Text></View>;
         }
-
         if (trainers.length === 0) {
-            return (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyStateText}>No trainers found in your area</Text>
-                </View>
-            );
+            return <View style={styles.emptyStateContainer}><Text style={styles.emptyStateText}>No trainers found in your area</Text></View>;
         }
-
         return trainers.map((trainer) => (
-            // 3. FIXED: Key is now trainer._id
-              <TrainerCard key={trainer._id} trainer={trainer} />
+            <TrainerCard key={trainer._id} trainer={trainer} onPress={() => handleTrainerPress(trainer._id)} />
         ));
     };
-    // END: RENDER LOGIC
 
-    const TrainerCard: React.FC<TrainerCardProps> = ({ trainer }) => (
-        <TouchableOpacity
-            style={styles.trainerCard}
-             onPress={() => handleTrainerPress(trainer._id)}
-            activeOpacity={0.7}
-        >
+    const TrainerCard: React.FC<TrainerCardProps> = ({ trainer, onPress }) => (
+        <TouchableOpacity style={styles.trainerCard} onPress={onPress} activeOpacity={0.8}>
+            <Image 
+                source={trainer.profilePhoto ? { uri: trainer.profilePhoto } : require('../assets/images/default-avatar.png')} 
+                style={styles.trainerImage} 
+            />
             <View style={styles.trainerInfo}>
-                <Text style={styles.distance}>{`${trainer.location.city}, ${trainer.location.state}`}</Text>
-                <Text style={styles.trainerName}>{`${trainer.firstName} ${trainer.lastName}`}</Text>
-                <Text style={styles.rating}>
-                    {trainer.averageRating.toFixed(1)} · {trainer.totalReviews} reviews
-                </Text>
-            </View>
-            <View style={styles.trainerImageContainer}>
-                {trainer.profilePhoto ? (
-                     <Image source={{ uri: trainer.profilePhoto }} style={styles.trainerImage} />
-                ) : (
-                    <View style={styles.trainerImagePlaceholder}>
-                        <View style={styles.personIcon} />
-                        <View style={styles.dogIcon} />
-                    </View>
-                )}
+                <Text style={styles.trainerName} numberOfLines={1}>{`${trainer.firstName} ${trainer.lastName}`}</Text>
+                <Text style={styles.trainerLocation}>{`${trainer.location.city}, ${trainer.location.state}`}</Text>
+                <View style={styles.ratingContainer}>
+                    <HugeiconsIcon icon={StarIcon} size={16} color="#FFC107" />
+                    <Text style={styles.ratingText}>
+                        {trainer.averageRating.toFixed(1)}
+                        <Text style={styles.reviewsText}> ({trainer.totalReviews} reviews)</Text>
+                    </Text>
+                </View>
             </View>
         </TouchableOpacity>
     );
 
     return (
         <SafeAreaView style={styles.container}>
-
-            {/* Header */}
             <View style={styles.header}>
-
                 <Text style={styles.headerTitle}>Woof Point</Text>
-                <TouchableOpacity
-                    onPress={toggleMenu}
-                    activeOpacity={0.7}
-                >
-                    <HugeiconsIcon
-                        icon={Menu01Icon}
-                        size={30}
-                        strokeWidth={1.5}
-                    />
+                <TouchableOpacity onPress={toggleMenu} style={styles.menuButton}>
+                    <HugeiconsIcon icon={Menu01Icon} size={28} strokeWidth={2} color={TEXT_PRIMARY} />
                 </TouchableOpacity>
             </View>
 
-            <ScrollView
-                style={styles.content}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollContent}
-            >
-                {/* Search Bar */}
+            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.searchContainer}>
+                   
                     <TextInput
                         style={styles.searchInput}
-                        placeholder="Enter ZIP code"
-                        placeholderTextColor="#999"
+                        placeholder="Search by ZIP code..."
+                        placeholderTextColor={TEXT_SECONDARY}
                         value={searchText}
                         onChangeText={setSearchText}
-                        onSubmitEditing={handleSearchSubmit}
                         returnKeyType="search"
                         keyboardType="numeric"
-                        maxLength={10}
                     />
+                    <HugeiconsIcon icon={Search01Icon} size={20} color={TEXT_SECONDARY} style={styles.searchIcon} /> 
                 </View>
 
-                {/* Filter Buttons */}
-                {/* <View style={styles.filtersContainer}> */}
-                    {/* <FilterButton
-                        title="Training"
-                        value={selectedSpecialization}
-                        onPress={handleSpecializationFilter}
-                    />
-                    <FilterButton
-                        title="Distance"
-                        value={selectedDistance}
-                        onPress={handleDistanceFilter}
-                    />
-                    <FilterButton
-                        title="Rating"
-                        value={selectedRating}
-                        onPress={handleRatingFilter}
-                    />
-                </View> */}
-
-                {/* Trainers List */}
+                <Text style={styles.sectionTitle}>Top Rated Trainers</Text>
                 <View style={styles.trainersContainer}>
-                    {trainers.length > 0 ? (
-                        trainers.map((trainer: Trainer) => (
-                            <TrainerCard key={trainer._id} trainer={trainer} />
-                        ))
-                    ) : (
-                        <View style={styles.emptyState}>
-                            <Text style={styles.emptyStateText}>No trainers found in your area</Text>
-                        </View>
-                    )}
+                    {renderContent()}
                 </View>
             </ScrollView>
 
-            {/* Bottom Navigation */}
             <View style={styles.bottomNav}>
-                <HugeiconsIcon
-                    icon={Home09Icon}
-                    size={30}
-                    strokeWidth={1.5}
-                    color="black"
-                />
-                <HugeiconsIcon
-                    icon={Calendar02Icon}
-                    size={30}
-                    strokeWidth={1.5}
-                    color="black" />
-                {/* <HugeiconsIcon
-                    icon={BubbleChatIcon}
-                    size={30}
-                    strokeWidth={1.5}
-                    color="black" /> */}
-                <TouchableOpacity onPress={() => navigation.navigate("OwnerProfile")}>
-                    <HugeiconsIcon
-                        icon={UserCircleIcon}
-                        size={30}
-                        strokeWidth={1.5}
-                        color="black" />
+                 <TouchableOpacity style={styles.bottomNavItem}>
+                    <HugeiconsIcon icon={Home09Icon} size={28} strokeWidth={2} color={PRIMARY} />
+                    <Text style={[styles.bottomNavText, { color: PRIMARY }]}>Home</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.bottomNavItem}>
+                    <HugeiconsIcon icon={Calendar02Icon} size={28} strokeWidth={2} color={TEXT_SECONDARY} />
+                    <Text style={styles.bottomNavText}>Bookings</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.bottomNavItem} onPress={() => navigation.navigate("OwnerProfile")}>
+                    <HugeiconsIcon icon={UserCircleIcon} size={28} strokeWidth={2} color={TEXT_SECONDARY} />
+                    <Text style={styles.bottomNavText}>Profile</Text>
                 </TouchableOpacity>
             </View>
 
-            <Modal
-                animationType='fade'
-                transparent={true}
-                visible={isMenuVisible}
-                onRequestClose={() =>
-                    setIsMenuVisible(false)
-                }
-            >
-                <TouchableOpacity
-                    style={styles.modalOverlay}
-                    onPress={() =>
-                        setIsMenuVisible(false)}
-                    activeOpacity={1}
-                >
+            <Modal animationType='fade' transparent={true} visible={isMenuVisible} onRequestClose={toggleMenu}>
+                <TouchableOpacity style={styles.modalOverlay} onPress={toggleMenu} activeOpacity={1}>
                     <View style={styles.menuContainer}>
                         <View style={styles.menuHeader}>
                             <Text style={styles.menuTitle}>Menu</Text>
-                            <TouchableOpacity onPress={() => setIsMenuVisible(false)}>
-                                <HugeiconsIcon icon={CancelCircleIcon} />
+                            <TouchableOpacity onPress={toggleMenu}>
+                                <HugeiconsIcon icon={CancelCircleIcon} size={24} color={TEXT_SECONDARY} />
                             </TouchableOpacity>
                         </View>
-
                         <View style={styles.menuItems}>
                             <TouchableOpacity style={styles.menuItem} onPress={handleEditProfile}>
-                                <HugeiconsIcon icon={FileEditIcon} />
+                                <HugeiconsIcon icon={FileEditIcon} size={22} color={TEXT_SECONDARY} />
                                 <Text style={styles.menuItemText}>Edit Profile</Text>
-                                <HugeiconsIcon icon={ArrowRight01Icon} />
+                                <HugeiconsIcon icon={ArrowRight01Icon} size={20} color={TEXT_SECONDARY} />
                             </TouchableOpacity>
-
                             <TouchableOpacity style={styles.menuItem} onPress={handlePetProfile}>
-                                <HugeiconsIcon icon={AddCircleIcon} />
+                                <HugeiconsIcon icon={AddCircleIcon} size={22} color={TEXT_SECONDARY} />
                                 <Text style={styles.menuItemText}>Add Your Pet</Text>
-                                <HugeiconsIcon icon={ArrowRight01Icon} />
+                                <HugeiconsIcon icon={ArrowRight01Icon} size={20} color={TEXT_SECONDARY} />
                             </TouchableOpacity>
-
                             <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-                                <HugeiconsIcon icon={LogoutSquare02Icon} color={PRIMARY} />
+                                <HugeiconsIcon icon={LogoutSquare02Icon} size={22} color={PRIMARY} />
                                 <Text style={[styles.menuItemText, { color: PRIMARY }]}>Logout</Text>
-                                <HugeiconsIcon
-                                    icon={ArrowRight01Icon}
-                                    color={PRIMARY}
-                                />
+                                <HugeiconsIcon icon={ArrowRight01Icon} size={20} color={PRIMARY} />
                             </TouchableOpacity>
                         </View>
                     </View>
                 </TouchableOpacity>
-
             </Modal>
-
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: BG,
-    },
+    container: { flex: 1, backgroundColor: BG },
+    loader: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        paddingVertical: 15,
-        backgroundColor: BG,
+        paddingVertical: 12,
+        backgroundColor: WHITE,
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: BORDER_COLOR,
     },
-    menuButton: {
-        padding: 5,
-        borderRadius: 4,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: PRIMARY,
-        fontFamily: "SF-Pro-Rounded-Bold"
-    },
-    content: {
-        flex: 1,
-    },
-    scrollContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-    },
+    headerTitle: { fontSize: 22, fontWeight: 'bold', color: PRIMARY },
+    menuButton: { padding: 5 },
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 20 },
     searchContainer: {
-        marginTop: 20,
-        marginBottom: 20,
-    },
-    searchInput: {
-        backgroundColor: '#F5F5F5',
-        paddingHorizontal: 15,
-        paddingVertical: 15,
-        borderRadius: 10,
-        fontSize: 16,
-        color: '#333',
-        borderWidth: 1,
-        borderColor: 'transparent',
-    },
-    filtersContainer: {
-        flexDirection: 'row',
-        marginBottom: 25,
-        gap: 10,
-    },
-    filterButton: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#F5F5F5',
-        paddingHorizontal: 15,
-        paddingVertical: 12,
-        borderRadius: 8,
+        backgroundColor: WHITE,
+        borderRadius: 12,
+        marginTop: 20,
+        marginBottom: 25,
         borderWidth: 1,
-        borderColor: 'transparent',
+        borderColor: BORDER_COLOR,
+        paddingHorizontal: 15,
     },
-    filterText: {
-        fontSize: 14,
-        color: '#666',
-        fontWeight: '500',
-        paddingHorizontal: 5
+    searchIcon: { 
+        // position: 'absolute', 
+        marginLeft: 10,
+        // marginRight: 15 , 
     },
-    dropdownIcon: {
-        fontSize: 12,
-        color: '#999',
+    searchInput: {
+        flex: 1,
+        paddingVertical: 15,
+        fontSize: 16,
+        color: TEXT_PRIMARY,
+        // paddingLeft: 10, 
+        // Add a little padding on the right for balance
+        // paddingRight: 15,
     },
-    trainersContainer: {
-        gap: 15,
-    },
+    sectionTitle: { fontSize: 18, fontWeight: '600', color: TEXT_PRIMARY, marginBottom: 15 },
+    trainersContainer: { gap: 15 },
     trainerCard: {
         flexDirection: 'row',
-        backgroundColor: '#FFF',
-        padding: 15,
-        borderRadius: 12,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        backgroundColor: WHITE,
+        padding: 12,
+        borderRadius: 16,
+        shadowColor: '#9e6b52',
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        borderWidth: 1,
-        borderColor: '#F8F8F8',
-    },
-    trainerInfo: {
-        flex: 1,
-        paddingRight: 15,
-        justifyContent: 'center',
-    },
-    distance: {
-        fontSize: 14,
-        color: '#999',
-        marginBottom: 5,
-        fontWeight: '400',
-    },
-    trainerName: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#333',
-        marginBottom: 5,
-    },
-    rating: {
-        fontSize: 14,
-        color: '#666',
-        fontWeight: '400',
-    },
-    trainerImageContainer: {
-        width: 80,
-        height: 80,
-        justifyContent: 'center',
+        shadowRadius: 10,
+        elevation: 5,
         alignItems: 'center',
     },
     trainerImage: {
-        width: 70,
-        height: 70,
-        borderRadius: 10,
-    },
-    trainerImagePlaceholder: {
-        width: 70,
-        height: 70,
-        backgroundColor: '#A8C5A0',
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-    },
-    personIcon: {
-        width: 25,
-        height: 25,
-        backgroundColor: '#333',
+        width: 80,
+        height: 80,
         borderRadius: 12,
-        position: 'absolute',
-        top: 15,
-        left: 15,
+        marginRight: 15,
+        backgroundColor: BORDER_COLOR,
     },
-    dogIcon: {
-        width: 20,
-        height: 15,
-        backgroundColor: PRIMARY,
-        borderRadius: 8,
-        position: 'absolute',
-        bottom: 15,
-        right: 15,
-    },
-    emptyState: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingVertical: 40,
-    },
-    emptyStateText: {
-        fontSize: 16,
-        color: '#999',
-        textAlign: 'center',
-    },
+    trainerInfo: { flex: 1, justifyContent: 'center' },
+    trainerName: { fontSize: 18, fontWeight: 'bold', color: TEXT_PRIMARY, marginBottom: 4 },
+    trainerLocation: { fontSize: 14, color: TEXT_SECONDARY, marginBottom: 6 },
+    ratingContainer: { flexDirection: 'row', alignItems: 'center' },
+    ratingText: { marginLeft: 5, fontSize: 14, color: TEXT_PRIMARY, fontWeight: '500' },
+    reviewsText: { color: TEXT_SECONDARY, fontWeight: '400' },
+    emptyStateContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, marginTop: 50 },
+    emptyStateText: { fontSize: 16, color: TEXT_SECONDARY, textAlign: 'center' },
     bottomNav: {
         flexDirection: 'row',
-        backgroundColor: '#FFF',
-        paddingVertical: 15,
+        backgroundColor: WHITE,
+        paddingTop: 10,
+        paddingBottom: Platform.OS === 'ios' ? 25 : 10, // <-- 2. ERROR FIXED
         paddingHorizontal: 20,
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
-        gap: 10,
-        justifyContent: 'space-between'
-    },
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        justifyContent: 'flex-start',
-    },
-    menuContainer: {
-        backgroundColor: '#fff',
-        marginTop: 80,
-        marginHorizontal: 20,
-        borderRadius: 12,
+        borderTopColor: BORDER_COLOR,
+        justifyContent: 'space-around',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
+        shadowOffset: { width: 0, height: -2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 5,
         elevation: 5,
+    },
+    bottomNavItem: { alignItems: 'center', gap: 4 },
+    bottomNavText: { fontSize: 12, color: TEXT_SECONDARY, fontWeight: '500' },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)' },
+    menuContainer: {
+        backgroundColor: BG,
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: '80%',
+        paddingTop: 60,
     },
     menuHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingBottom: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        borderBottomColor: BORDER_COLOR,
     },
-    menuTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#333',
-    },
-    menuItems: {
-        paddingVertical: 10,
-    },
+    menuTitle: { fontSize: 20, fontWeight: 'bold', color: TEXT_PRIMARY },
+    menuItems: { paddingVertical: 10 },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingVertical: 15,
-        borderRadius: 8,
-        marginHorizontal: 10,
     },
     menuItemText: {
         flex: 1,
         fontSize: 16,
-        color: '#333',
+        color: TEXT_SECONDARY,
         fontWeight: '500',
-        marginLeft: 5
+        marginLeft: 15,
     },
 });
 
 export default OwnerHome;
+
