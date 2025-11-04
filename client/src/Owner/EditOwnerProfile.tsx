@@ -8,6 +8,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
+import config from "../config";
 
 interface OwnerProfile {
   firstName: string;
@@ -40,7 +41,7 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
         return;
       }
 
-      const response = await axios.get("http://localhost:3001/api/owner/profile", {
+      const response = await axios.get(`${config.apiUrl}/owner/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -81,7 +82,7 @@ const EditOwnerProfile: React.FC<Props> = ({ navigation }) => {
       if (!token) return;
 
       await axios.put(
-        "http://localhost:3001/api/owner/profile",
+        `${config.apiUrl}/owner/profile`,
         {
           firstName: form.firstName,
           lastName: form.lastName,

@@ -16,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Menu01Icon, Home09Icon, Calendar02Icon, BubbleChatIcon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
+import config from "../config";
 
 const PRIMARY = "#E97B47";
 
@@ -79,7 +80,7 @@ const TrainerHome: React.FC<Props> = ({ navigation, route }) => {
                         try {
                             // Call logout API
                             await axios.post(
-                                'http://localhost:3001/api/auth/logout',
+                                `${config.apiUrl}/auth/logout`,
                                 {},
                                 {
                                     headers: {

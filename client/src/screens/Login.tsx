@@ -4,6 +4,7 @@ import axios from 'axios';
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from '../../App';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import config from '../config';
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
@@ -38,7 +39,7 @@ const Login: React.FC<Props> = ({ navigation }) => {
             };
 
             const response = await axios.post(
-                'http://localhost:3001/api/auth/login',
+                `${config.apiUrl}/auth/login`,
                 loginData,
                 { timeout: 10000 }
             );

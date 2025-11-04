@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import config from "../config";
 
 interface OwnerProfile {
   firstName: string;
@@ -27,7 +28,7 @@ const OwnerProfile = ({ navigation }: any) => {
     try {
       const token = await AsyncStorage.getItem("authToken");
       const response = await axios.get(
-        "http://localhost:3001/api/owner/profile",
+        `${config.apiUrl}/owner/profile`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import config from '../config';
 
 // Constants for consistent styling
 const PRIMARY = '#E97B47';
@@ -127,7 +128,7 @@ const Signup: React.FC = () => {
 
         setIsLoading(true);
         try {
-            const response = await axios.post("http://localhost:3001/api/auth/signup", {
+            const response = await axios.post(`${config.apiUrl}/auth/signup`, {
                 firstName: firstName.trim(),
                 lastName: lastName.trim(),
                 email: email.toLowerCase().trim(),

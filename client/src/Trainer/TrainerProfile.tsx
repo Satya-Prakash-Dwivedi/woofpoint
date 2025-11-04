@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import config from "../config";
 
 interface TrainerProfile {
     firstName: string;
@@ -29,7 +30,7 @@ const TrainerProfileScreen = ({ navigation }: any) => {
     const fetchProfile = async () => {
         try {
             const token = await AsyncStorage.getItem("authToken");
-            const response = await axios.get("http://localhost:3001/api/trainer/profile", {
+            const response = await axios.get(`${config.apiUrl}/trainer/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = response.data;

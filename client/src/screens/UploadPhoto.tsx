@@ -4,6 +4,7 @@ import { launchImageLibrary, Asset } from "react-native-image-picker";
 import axios from "axios";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../App";
+import config from "../config";
 
 type Props = NativeStackScreenProps<RootStackParamList, "UploadPhoto">;
 
@@ -45,7 +46,7 @@ const UploadPhoto: React.FC<Props> = ({ navigation, route }) => {
         try {
             console.log('Starting upload...');
             const res = await axios.post(
-                "http://localhost:3001/api/auth/upload-photo",
+                `${config.apiUrl}/auth/upload-photo`,
                 formData,
                 {
                     headers: {

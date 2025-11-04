@@ -8,7 +8,8 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { ArrowLeft02Icon, DeleteThrowIcon, AddCircleIcon, Edit01Icon } from "@hugeicons/core-free-icons";
-import DropDownPicker from 'react-native-dropdown-picker'; // 👈 Import the library
+import DropDownPicker from 'react-native-dropdown-picker';
+import config from "../config";
 
 interface Dog {
     _id?: string;
@@ -49,7 +50,7 @@ const AddPetProfile: React.FC<Props> = ({ navigation }) => {
                 return;
             }
 
-            const response = await axios.get("http://localhost:3001/api/owner/profile", {
+            const response = await axios.get(`${config.apiUrl}/owner/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -61,6 +62,8 @@ const AddPetProfile: React.FC<Props> = ({ navigation }) => {
             setLoading(false);
         }
     };
+
+
 
     useEffect(() => {
         fetchDogs();
@@ -76,7 +79,7 @@ const AddPetProfile: React.FC<Props> = ({ navigation }) => {
             if (!token) return;
 
             const response = await axios.post(
-                "http://localhost:3001/api/owner/dogs",
+                `${config.apiUrl}/owner/dogs`,
                 newDog,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -105,7 +108,7 @@ const AddPetProfile: React.FC<Props> = ({ navigation }) => {
                             if (!token) return;
 
                             await axios.delete(
-                                `http://localhost:3001/api/owner/dogs/${dogId}`,
+                                `${config.apiUrl}/owner/dogs/${dogId}`,
                                 { headers: { Authorization: `Bearer ${token}` } }
                             );
                             setDogs(prevDogs => prevDogs.filter(dog => dog._id !== dogId));
@@ -135,7 +138,7 @@ const AddPetProfile: React.FC<Props> = ({ navigation }) => {
             if (!token) return;
 
             await axios.put(
-                `http://localhost:3001/api/owner/dogs/${editingDogId}`,
+                `${config.apiUrl}/owner/dogs/${editingDogId}`,
                 newDog,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

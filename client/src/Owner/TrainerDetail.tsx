@@ -15,6 +15,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App'; // Adjust this import path if needed
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { ArrowLeft02Icon, StarIcon, Award02Icon, Dollar01Icon, Time01Icon } from '@hugeicons/core-free-icons';
+import config from '../config';
 
 const PRIMARY = '#E97B47';
 const BG = '#FEFBF6';
@@ -55,7 +56,7 @@ const TrainerDetail: React.FC<Props> = ({ route, navigation }) => {
                     return;
                 }
                 
-                const apiUrl = `http://localhost:3001/api/owner/trainers/${trainerId}`;
+                const apiUrl = `${config.apiUrl}/owner/trainers/${trainerId}`;
                 console.log(`--- Debug: Making API call to: ${apiUrl}`);
 
                 const response = await axios.get(apiUrl, {

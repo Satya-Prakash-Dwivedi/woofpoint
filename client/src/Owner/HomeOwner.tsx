@@ -19,6 +19,7 @@ import { HugeiconsIcon } from '@hugeicons/react-native';
 import { Menu01Icon, Home09Icon, Calendar02Icon, UserCircleIcon, CancelCircleIcon, FileEditIcon, LogoutSquare02Icon, ArrowRight01Icon, AddCircleIcon, Search01Icon, StarIcon } from '@hugeicons/core-free-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
+import config from '../config';
 
 // Design System Colors & Constants
 const PRIMARY = '#E97B47';
@@ -66,7 +67,7 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                     throw new Error("Authentication token not found.");
                 }
 
-                const response = await axios.get('http://localhost:3001/api/owner/trainers', {
+                const response = await axios.get(`${config.apiUrl}/owner/trainers`, {
                     headers: { Authorization: `Bearer ${authToken}` },
                 });
                 setTrainers(response.data);
@@ -106,7 +107,7 @@ const OwnerHome: React.FC<Props> = ({ navigation, route }) => {
                 style: 'destructive',
                 onPress: async () => {
                     try {
-                        await axios.post('http://localhost:3001/api/auth/logout', {}, {
+                        await axios.post(`${config.apiUrl}/auth/logout`, {}, {
                             headers: { Authorization: `Bearer ${token}` },
                         });
                     } catch (error) {

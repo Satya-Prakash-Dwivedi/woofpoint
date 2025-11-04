@@ -16,6 +16,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { HugeiconsIcon } from '@hugeicons/react-native';
 import { ArrowLeft02Icon } from "@hugeicons/core-free-icons"
+import config from "../config";
 
 
 interface TrainerProfile {
@@ -63,7 +64,7 @@ const EditTrainerProfile: React.FC<Props> = ({ navigation }) => {
                 return;
             }
 
-            const response = await axios.get("http://localhost:3001/api/trainer/profile", {
+            const response = await axios.get(`${config.apiUrl}/trainer/profile`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -102,7 +103,7 @@ const EditTrainerProfile: React.FC<Props> = ({ navigation }) => {
             if (!token) return;
 
             await axios.put(
-                "http://localhost:3001/api/trainer/profile",
+                `${config.apiUrl}/trainer/profile`,
                 {
                     ...form,
                     bio: form.bio,
