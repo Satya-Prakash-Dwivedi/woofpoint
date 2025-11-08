@@ -14,6 +14,10 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "UP" });
+});
+
 app.use("/api/auth", userRoutes)
 app.use("/api/trainer", trainerRoutes)
 app.use("/api/owner", ownerRoutes);
