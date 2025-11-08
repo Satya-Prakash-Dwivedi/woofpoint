@@ -18,11 +18,15 @@ app.use("/api/auth", userRoutes)
 app.use("/api/trainer", trainerRoutes)
 app.use("/api/owner", ownerRoutes);
 
+const startServer = async () => {
+   try {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    console.log("MongoDB Connection ✅");
+     app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+   } catch (err) {
+     console.error("❌ Failed to start server:", err);
+     process.exit(1);
+  }
+};
 
-mongoose
-    .connect(process.env.MONGODB_URI as string)
-    .then(() => {
-        console.log("MongoDB Connection ✅")
-        app.listen(PORT, () => console.log(`Server listening at http://localhost:${PORT}`))
-    })
-    .catch((err) => console.error("❌ MongoDB error", err))
+ startServer();
