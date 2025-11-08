@@ -2,7 +2,7 @@ const dev = {
     apiUrl : "http://localhost:3001/api",
 }
 const prod = {
-    apiUrl : "https://9xhmunc89s.us-east-1.awsapprunner.com/api",
+    apiUrl : "http://35.154.95.127:3001/api",
 }
 
 const config = process.env.NODE_ENV === 'development' ? dev : prod;
